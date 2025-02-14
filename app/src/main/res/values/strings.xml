@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Movies_Manager</string>
+    <string name="title">Movies Manager</string>
+    <string name="Add_Button_Description">Add Movies</string>
 </resources>
