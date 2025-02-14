@@ -40,6 +40,15 @@ dependencies {
     implementation libs.realm.gradle.plugin.v10101
     implementation libs.core.ktx
 
+    //OkHTTP
+    implementation libs.okhttp
+    implementation platform(libs.okhttp.bom)
+    testImplementation libs.mockwebserver
+
+    // Define any required OkHttp artifacts without version
+    implementation(libs.okhttp3.okhttp)
+    implementation(libs.logging.interceptor)
+
     //Android Libs
     implementation libs.appcompat
     implementation libs.material

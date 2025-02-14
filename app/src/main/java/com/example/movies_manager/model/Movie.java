@@ -2,8 +2,8 @@ package com.example.movies_manager.model;
 
 public class Movie {
 
-    private int id_title;
-    private String overview, popularity, posterPath;
+    private int id_title, popularity;
+    private String overview, posterPath;
     private boolean isFavorite;
 
 
@@ -11,7 +11,7 @@ public class Movie {
     //Constructor
     //***********************
 
-    public Movie(int id_title, String overview, String popularity, String posterPath, boolean isFavorite) {
+    public Movie(int id_title, String overview, int popularity, String posterPath, boolean isFavorite) {
         this.id_title = id_title;
         this.overview = overview;
         this.popularity = popularity;
@@ -41,11 +41,11 @@ public class Movie {
         this.overview = overview;
     }
 
-    public String getPopularity() {
+    public int getPopularity() {
         return popularity;
     }
 
-    public void setPopularity(String popularity) {
+    public void setPopularity(int popularity) {
         this.popularity = popularity;
     }
 
