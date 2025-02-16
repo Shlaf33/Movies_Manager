@@ -1,7 +1,29 @@
 <resources>
     <string name="app_name">Movies_Manager</string>
     <string name="title">Movies Manager</string>
-    <string name="Add_Button_Description">Add Movies</string>
-    <string name="Films">Films</string>
-    <string name="Favoris">Favoris</string>
+
+    //View Menu Title
+    <string name="home_button">Home</string>
+    <string name="search_button">Search</string>
+    <string name="comment_menu_button">Comment</string>
+    <string name="notify_menu_button">Notify</string>
+    <string name="profile_menu_button">Profile</string>
+
+
+
+    //Content description Text
+    <string name="app_logo">App logo</string>
+    <string name="comment_button">Comment</string>
+    <string name="option_button">Options</string>
+    <string name="share_button">Share</string>
+    <string name="favorite_button">Favorite</string>
+    <string name="movie_image">Movie image</string>
+    <string name="add_Button_Description">Add Movies</string>
+    <string name="films">Films</string>
+    <string name="favoris">Favoris</string>
+    <string name="movie_title">Movie Title</string>
+    <string name="movie_release_date">Release date</string>
+    <string name="movie_popularity">Popularity</string>
+    <string name="movie_overview">Overview</string>
+    <string name="movie_overview_text">Overview Text</string>
 </resources>

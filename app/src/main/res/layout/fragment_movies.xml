@@ -8,85 +8,137 @@
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/main_color"
+        app:cardCornerRadius="10dp">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
+
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_margin="18dp"
-                android:orientation="horizontal">
+                android:baselineAligned="false"
+                android:orientation="horizontal"
+                android:weightSum="2">
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:orientation="vertical">
 
                     <ImageView
-                        android:id="@+id/imageView"
-                        android:layout_width="100dp"
+                        android:id="@+id/iv_movie_image"
+                        android:layout_width="match_parent"
                         android:layout_height="150dp"
+                        android:contentDescription="@string/movie_image"
                         android:scaleType="centerCrop"
                         app:srcCompat="@mipmap/ic_movie_image_vaiana_foreground"
                         tools:srcCompat="@mipmap/ic_movie_image_vaiana_foreground" />
 
                     <TextView
-                        android:id="@+id/textView2"
+                        android:id="@+id/tv_movie_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Movie Title" />
+                        android:breakStrategy="simple"
+                        android:ellipsize="end"
+                        android:maxLines="2"
+                        android:text="@string/movie_title"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/textView3"
+                        android:id="@+id/tv_release_date"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Release Date" />
+                        android:text="@string/movie_release_date"
+                        android:textColor="@color/white"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/tv_popularity"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/movie_popularity"
+                        android:textColor="@color/white" />
                 </LinearLayout>
 
-                <TextView
-                    android:id="@+id/textView"
-                    android:layout_width="match_parent"
+                <LinearLayout
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:text="Overview"
-                    android:textAlignment="center" />
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_overview"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/movie_overview"
+                        android:textAlignment="center"
+                        android:textColor="@color/white" />
+
+                    <TextView
+                        android:id="@+id/tv_overview_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="@string/movie_overview_text"
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
+                </LinearLayout>
             </LinearLayout>
+
+            <View
+                android:id="@+id/divider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/grey" />
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
                 android:orientation="horizontal">
 
                 <ImageButton
-                    android:id="@+id/imageButton6"
+                    android:id="@+id/ib_comment"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="48dp"
                     android:layout_weight="1"
-                    android:contentDescription="test"
+                    android:contentDescription="@string/comment_button"
+                    android:backgroundTint="@color/main_color"
                     app:srcCompat="@drawable/baseline_mode_comment_24" />
 
                 <ImageButton
-                    android:id="@+id/imageButton3"
+                    android:id="@+id/ib_share"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="48dp"
                     android:layout_weight="1"
+                    android:contentDescription="@string/share_button"
+                    android:backgroundTint="@color/main_color"
                     app:srcCompat="@drawable/baseline_repeat_24" />
 
                 <ImageButton
-                    android:id="@+id/imageButton4"
+                    android:id="@+id/ib_favorite"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="48dp"
                     android:layout_weight="1"
+                    android:contentDescription="@string/favorite_button"
+                    android:backgroundTint="@color/main_color"
                     app:srcCompat="@drawable/baseline_favorite_border_24" />
 
                 <ImageButton
-                    android:id="@+id/imageButton5"
+                    android:id="@+id/ib_options"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="48dp"
                     android:layout_weight="1"
+                    android:contentDescription="@string/option_button"
+                    android:backgroundTint="@color/main_color"
                     app:srcCompat="@drawable/baseline_more_horiz_24" />
             </LinearLayout>
 

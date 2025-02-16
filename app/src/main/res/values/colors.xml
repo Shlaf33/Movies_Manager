@@ -4,6 +4,8 @@
     <color name="white">#FFFFFFFF</color>
     <color name="main_color">#161E27</color>
     <color name="button_background">#4376FB</color>
+    <color name="grey">#7F7F7F</color>
+    <color name="gey_blue">#627589</color>
     <color name="selected_tab">#FFFFFFFF</color>
     <color name="unselected_tab">#9A9EA3</color>
 </resources>
