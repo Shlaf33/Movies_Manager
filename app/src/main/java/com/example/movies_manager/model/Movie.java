@@ -3,7 +3,7 @@ package com.example.movies_manager.model;
 public class Movie {
 
     private int id_title, popularity;
-    private String overview, posterPath;
+    private String title, overview, posterPath, releaseDate;
     private boolean isFavorite;
 
 
@@ -11,11 +11,13 @@ public class Movie {
     //Constructor
     //***********************
 
-    public Movie(int id_title, String overview, int popularity, String posterPath, boolean isFavorite) {
+    public Movie(int id_title, String title, String overview, int popularity, String posterPath, String releaseDate, boolean isFavorite) {
         this.id_title = id_title;
+        this.title = title;
         this.overview = overview;
         this.popularity = popularity;
         this.posterPath = posterPath;
+        this.releaseDate = releaseDate;
         this.isFavorite = isFavorite;
     }
 
@@ -31,6 +33,14 @@ public class Movie {
 
     public void setId_title(int id_title) {
         this.id_title = id_title;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getOverview() {
@@ -55,6 +65,14 @@ public class Movie {
 
     public void setPosterPath(String posterPath) {
         this.posterPath = posterPath;
+    }
+
+    public String getReleaseDate() {
+        return releaseDate;
+    }
+
+    public void setReleaseDate(String releaseDate) {
+        this.releaseDate = releaseDate;
     }
 
     public boolean isFavorite() {
