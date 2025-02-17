@@ -39,6 +39,7 @@ dependencies {
     //Realm Database
     implementation libs.realm.gradle.plugin.v10101
     implementation libs.core.ktx
+    implementation libs.android.adapters
 
     //OkHTTP
     implementation libs.okhttp
