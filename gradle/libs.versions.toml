@@ -1,6 +1,7 @@
 [versions]
 agp = "8.7.3"
 androidAdapters = "3.x.x"
+androidAdaptersVersion = "3.1.0"
 converterGson = "2.9.0"
 coreKtx = "1.15.0"
 glide = "4.16.0"
@@ -20,6 +21,7 @@ retrofit = "2.9.0"
 
 [libraries]
 android-adapters = { module = "io.realm:android-adapters", version.ref = "androidAdapters" }
+android-adapters-v310 = { module = "io.realm:android-adapters", version.ref = "androidAdaptersVersion" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }

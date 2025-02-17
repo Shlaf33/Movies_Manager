@@ -10,6 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:backgroundTint="@color/main_color"
+        app:cardBackgroundColor="@color/grey"
         app:cardCornerRadius="10dp">
 
         <LinearLayout
@@ -36,8 +37,9 @@
                         android:id="@+id/iv_movie_image"
                         android:layout_width="match_parent"
                         android:layout_height="150dp"
+                        android:adjustViewBounds="true"
                         android:contentDescription="@string/movie_image"
-                        android:scaleType="centerCrop"
+                        android:scaleType="fitXY"
                         app:srcCompat="@mipmap/ic_movie_image_vaiana_foreground"
                         tools:srcCompat="@mipmap/ic_movie_image_vaiana_foreground" />
 
@@ -83,13 +85,22 @@
                         android:textAlignment="center"
                         android:textColor="@color/white" />
 
-                    <TextView
-                        android:id="@+id/tv_overview_text"
+                    <ScrollView
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:text="@string/movie_overview_text"
-                        android:textColor="@color/white"
-                        android:textSize="16sp" />
+                        android:layout_height="wrap_content"
+                        android:fillViewport="true"
+                        android:scrollbarSize="4dp"
+                        android:scrollbars="vertical">
+
+                        <TextView
+                            android:id="@+id/tv_overview_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="@string/movie_overview_text"
+                            android:textColor="@color/white"
+                            android:textSize="12sp" />
+                    </ScrollView>
                 </LinearLayout>
             </LinearLayout>
 
@@ -110,8 +121,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="48dp"
                     android:layout_weight="1"
-                    android:contentDescription="@string/comment_button"
                     android:backgroundTint="@color/main_color"
+                    android:contentDescription="@string/comment_button"
                     app:srcCompat="@drawable/baseline_mode_comment_24" />
 
                 <ImageButton
@@ -119,8 +130,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="48dp"
                     android:layout_weight="1"
-                    android:contentDescription="@string/share_button"
                     android:backgroundTint="@color/main_color"
+                    android:contentDescription="@string/share_button"
                     app:srcCompat="@drawable/baseline_repeat_24" />
 
                 <ImageButton
@@ -128,8 +139,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="48dp"
                     android:layout_weight="1"
-                    android:contentDescription="@string/favorite_button"
                     android:backgroundTint="@color/main_color"
+                    android:contentDescription="@string/favorite_button"
                     app:srcCompat="@drawable/baseline_favorite_border_24" />
 
                 <ImageButton
@@ -137,8 +148,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="48dp"
                     android:layout_weight="1"
-                    android:contentDescription="@string/option_button"
                     android:backgroundTint="@color/main_color"
+                    android:contentDescription="@string/option_button"
                     app:srcCompat="@drawable/baseline_more_horiz_24" />
             </LinearLayout>
 

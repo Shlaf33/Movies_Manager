@@ -1,4 +1,4 @@
-package com.example.movies_manager.service;
+package com.example.movies_manager.application;
 
 import android.app.Application;
 

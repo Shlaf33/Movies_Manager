@@ -1,15 +1,23 @@
 package com.example.movies_manager.model;
 
-public class Movie {
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
-    private int id_title, popularity;
+public class Movie extends RealmObject {
+
+    @PrimaryKey
+    private int id_title;
+    private int popularity;
     private String title, overview, posterPath, releaseDate;
     private boolean isFavorite;
 
 
     //***********************
-    //Constructor
+    //Constructors
     //***********************
+
+    public Movie() {
+    }
 
     public Movie(int id_title, String title, String overview, int popularity, String posterPath, String releaseDate, boolean isFavorite) {
         this.id_title = id_title;
