@@ -1,5 +1,7 @@
 package com.example.movies_manager.repositories;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -23,8 +25,10 @@ public class MovieRepository {
 
     private static final String API_TOKEN = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI2M2Q0ZTY2MjMzNzU4MzZjNjhkZmIxMmRmODNkNTg3ZSIsIm5iZiI6MTczOTUyMzY4Ni43NDg5OTk4LCJzdWIiOiI2N2FmMDY2NmExOGViZjJhYzU4ZTVmNzIiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.mdHxMj7gwa3s3z-tAKyFNFIhEGC6Isob1Zyrg3Z7DX8";
     private static final String ACCEPT_HEADER = "application/json";
-    private MovieApiService movieApiService; // Votre service Retrofit pour l'API
+    private MovieApiService movieApiService;
     private Realm realm;
+
+    private RealmResults<Movie> favorites;
 
     public MovieRepository() {
         movieApiService = RetrofitService.getInstance();
@@ -51,7 +55,7 @@ public class MovieRepository {
                                         r.getPopularity() != null ? r.getPopularity().intValue() : 0,
                                         "https://image.tmdb.org/t/p/w500"+r.getPoster_path(),
                                         r.getRelease_date(),
-                                        false  // Par défaut, non favori
+                                        false
                                 );
                                 movies.add(movie);
                             }
@@ -80,7 +84,14 @@ public class MovieRepository {
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                // Utilise copyToRealmOrUpdate pour mettre à jour si l'objet existe déjà
+                for (Movie m : movies) {
+                    Movie existing = realm.where(Movie.class)
+                            .equalTo("id_title", m.getId_title())
+                            .findFirst();
+                    if (existing != null && existing.isFavorite()) {
+                        m.setFavorite(true);
+                    }
+                }
                 realm.insertOrUpdate(movies);
             }
         });
@@ -93,13 +104,17 @@ public class MovieRepository {
      */
     public LiveData<List<Movie>> getFavoriteMovies() {
         MutableLiveData<List<Movie>> liveData = new MutableLiveData<>();
-        RealmResults<Movie> favorites = realm.where(Movie.class)
+        Realm realmLocal = Realm.getDefaultInstance();
+        favorites = realmLocal.where(Movie.class)
                 .equalTo("isFavorite", true)
                 .findAllAsync();
         favorites.addChangeListener(new RealmChangeListener<RealmResults<Movie>>() {
             @Override
             public void onChange(RealmResults<Movie> movies) {
-                liveData.postValue(realm.copyFromRealm(movies));
+                Log.d("MovieRepository", "Favorites changed, count: " + movies.size());
+                Log.d("RealmCheck", "Is realm closed? " + realmLocal.isClosed());
+                liveData.postValue(realmLocal.copyFromRealm(movies));
+
             }
         });
         return liveData;
@@ -111,16 +126,31 @@ public class MovieRepository {
      * @param movie Le film dont le statut doit être modifié.
      */
     public void toggleFavorite(final Movie movie) {
+        Log.d("RealmCheck", "Is realm closed while addFav? " + realm.isClosed());
+        Log.d("MovieRepository", "Movie is favorite : " + movie.isFavorite());
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 // Récupérer l'instance gérée par Realm
+
                 Movie managedMovie = realm.where(Movie.class)
                         .equalTo("id_title", movie.getId_title())
                         .findFirst();
                 if (managedMovie != null) {
-                    managedMovie.setFavorite(!managedMovie.isFavorite());
+                    boolean newValue = !managedMovie.isFavorite();
+                    managedMovie.setFavorite(newValue);
+                    Log.d("MovieRepository", "Inside transaction: Managed movie favorite set to " + newValue);
                 }
+            }
+        }, new Realm.Transaction.OnSuccess() {
+            @Override
+            public void onSuccess() {
+                Log.d("MovieRepository", "Toggle transaction ok");
+            }
+        }, new Realm.Transaction.OnError() {
+            @Override
+            public void onError(Throwable error) {
+                Log.e("MovieRepository", "Toggle transaction error", error);
             }
         });
     }

@@ -103,17 +103,18 @@
         android:background="@color/main_color_background"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_movies"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
         android:layout_margin="16dp"
         android:backgroundTint="@color/button_background"
         android:contentDescription="@string/add_Button_Description"
         android:src="@drawable/baseline_movie_edit_24"
-        app:tint="@color/white"
-        app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Full" />
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Full"
+        app:tint="@color/white" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"

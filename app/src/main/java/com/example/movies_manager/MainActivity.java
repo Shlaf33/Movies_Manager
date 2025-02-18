@@ -1,18 +1,27 @@
 package com.example.movies_manager;
 
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.example.movies_manager.adapter.MoviesAdapter;
 import com.example.movies_manager.adapter.MoviesPagerAdapter;
+import com.example.movies_manager.viewModel.MovieViewModel;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 public class MainActivity extends AppCompatActivity {
 
     private MoviesPagerAdapter moviesPagerAdapter;
+
+    private MovieViewModel movieViewModel;
+    private FloatingActionButton fab_movies;
+    private MoviesAdapter adapter;
     private ViewPager2 viewPager;
     private TabLayout tabLayout;
 
@@ -23,13 +32,26 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_movies_list);
 
         // Initialisation de la RecyclerView et de son adapter
-        viewPager = findViewById(R.id.viewPager); // Assurez-vous d'avoir cet ID dans votre layout
-        tabLayout = findViewById(R.id.tabs); // Même remarque pour l'ID du TabLayout
+        viewPager = findViewById(R.id.viewPager);
+        tabLayout = findViewById(R.id.tabs);
+        fab_movies = findViewById(R.id.fab_movies);
 
         moviesPagerAdapter = new MoviesPagerAdapter(this);
         viewPager.setAdapter(moviesPagerAdapter);
+        getPageTitle();
 
-        // Configuration des onglets avec le ViewPager
+
+        fab_movies.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // Observer les films en cours ("Now Playing")
+            }
+        });
+    }
+
+    // Configuration des onglets avec le ViewPager
+    public void getPageTitle(){
         new TabLayoutMediator(tabLayout, viewPager,
                 (tab, position) -> {
                     if (position == 0) {
@@ -39,4 +61,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }).attach();
     }
+
+
 }

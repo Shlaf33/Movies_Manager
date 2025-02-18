@@ -1,6 +1,7 @@
 package com.example.movies_manager.viewModel;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.movies_manager.model.Movie;
