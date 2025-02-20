@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_movies_list);
 
-        // Initialisation de la RecyclerView et de son adapter
+
         viewPager = findViewById(R.id.viewPager);
         tabLayout = findViewById(R.id.tabs);
 

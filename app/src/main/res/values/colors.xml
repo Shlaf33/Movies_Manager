@@ -5,6 +5,7 @@
     <color name="main_color">#161E27</color>
     <color name="main_color_background">#232F3D</color>
     <color name="button_background">#4376FB</color>
+    <color name="blue_sign_in">#10B6DE</color>
     <color name="grey">#7F7F7F</color>
     <color name="gey_blue">#627589</color>
     <color name="selected_tab">#FFFFFFFF</color>

@@ -3,10 +3,13 @@ package com.example.movies_manager.model;
 import java.util.Date;
 
 import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 public class User extends RealmObject {
 
-    private int id, session_id, guest_session_id;
+    @PrimaryKey
+    private int id;
+    private int session_id, guest_session_id;
     private String username;
     private Date expire_at;
 

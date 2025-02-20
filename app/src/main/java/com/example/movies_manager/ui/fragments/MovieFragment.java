@@ -1,6 +1,5 @@
 package com.example.movies_manager.ui.fragments;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,10 +18,6 @@ import com.example.movies_manager.adapter.MoviesAdapter;
 import com.example.movies_manager.model.Movie;
 import com.example.movies_manager.viewModel.MovieViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
-import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MovieFragment extends Fragment implements MoviesAdapter.OnMovieListener, MoviesAdapter.OnDeleteMovieListener {
 
@@ -113,12 +108,11 @@ public class MovieFragment extends Fragment implements MoviesAdapter.OnMovieList
     @Override
     public void onAddFavClick(Movie movie) {
 
-        if(!movieViewModel.isMovieFavorite(movie)){
+        if (!movieViewModel.isMovieFavorite(movie)) {
             Toast.makeText(getContext(), movie.getTitle() + " ajouté au favoris", Toast.LENGTH_SHORT).show();
             adapter.changeFavoriteIcon(movie.getId_title(), true);
             movieViewModel.toggleFavorite(movie);
-        }
-        else{
+        } else {
             Toast.makeText(getContext(), movie.getTitle() + " supprimer des favoris", Toast.LENGTH_SHORT).show();
             adapter.changeFavoriteIcon(movie.getId_title(), false);
             movieViewModel.toggleFavorite(movie);
@@ -145,7 +139,7 @@ public class MovieFragment extends Fragment implements MoviesAdapter.OnMovieList
     //Observe movies in database and display them in adapter or displaying a Toast when no more movies available
     //**********************************************************************************************************
 
-    public void observeMovieData(){
+    public void observeMovieData() {
         movieViewModel.getTenMoviesFromDatabase().observe(getViewLifecycleOwner(), movies -> {
             if (movies != null && !movies.isEmpty()) {
                 adapter.updateMovies(movies);
