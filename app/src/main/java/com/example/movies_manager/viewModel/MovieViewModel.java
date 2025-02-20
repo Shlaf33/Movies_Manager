@@ -1,5 +1,8 @@
 package com.example.movies_manager.viewModel;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -10,45 +13,116 @@ import com.example.movies_manager.repositories.MovieRepository;
 import java.util.List;
 
 public class MovieViewModel extends ViewModel {
+
+    //*****************
+    //Variables
+    //*****************
+
     private final MovieRepository movieRepository;
-    private LiveData<List<Movie>> nowPlayingMovies;
+
+    private LiveData<List<Movie>> moviesFromDatabase;
     private final LiveData<List<Movie>> favoriteMovies;
+
+    private final MutableLiveData<List<Movie>> moviesLiveData = new MutableLiveData<>();
+
+    private final MutableLiveData<Boolean> dataLoaded = new MutableLiveData<>();
+
+
+
+
+    //*****************
+    //Constructor
+    //*****************
 
     public MovieViewModel() {
         movieRepository = new MovieRepository();
-        // Récupération des films favoris dès l'initialisation du ViewModel
         favoriteMovies = movieRepository.getFavoriteMovies();
+        dataLoaded.observeForever(loaded -> {
+            if (loaded != null && loaded) {
+                movieRepository.getTenMoviesFromDatabase().observeForever(movies -> {
+                    moviesLiveData.postValue(movies);
+                });
+            }
+        });
     }
 
-    /**
-     * Charge la liste des films en cours depuis l'API et la retourne sous forme de LiveData.
-     *
-     * @param language Langue souhaitée (ex. "fr-FR")
-     * @param page     Numéro de page à récupérer
-     * @return LiveData contenant la liste des films
-     */
-    public LiveData<List<Movie>> getNowPlayingMovies(String language, int page) {
-        nowPlayingMovies = movieRepository.getNowPlayingMovies(language, page);
-        return nowPlayingMovies;
+
+
+
+    //*************************************************
+    // Méthode pour récupérer les films depuis l'API
+    //*************************************************
+
+    public void getNowPlayingMovies() {
+        movieRepository.getNowPlayingMovies("fr-FR",1, () -> {
+            dataLoaded.postValue(true);
+        });
+
     }
 
-    /**
-     * Retourne la liste des films favoris stockés en base locale.
-     *
-     * @return LiveData contenant la liste des films favoris
-     */
+    public LiveData<Boolean> getDataLoaded(){
+        return dataLoaded;
+    }
+
+    //********************************************
+    //Return the first 10 movies from database
+    //********************************************
+
+    public LiveData<List<Movie>> getTenMoviesFromDatabase(){
+        moviesFromDatabase = movieRepository.getTenMoviesFromDatabase();
+        return moviesFromDatabase;
+    }
+
+
+    //******************************************************************************
+    //Return either a movie is favorite or not for updating UI ans display a Toast
+    //******************************************************************************
+
+    public boolean isMovieFavorite(Movie movie){
+        return movieRepository.isMovieFavorite(movie);
+    }
+
+
+
+    //********************************
+    //Delete a movie from database
+    //********************************
+
+    public void deleteMovieFromDatabase(Movie movie){
+        movieRepository.deleteMovie(movie);
+    }
+
+
+    //*******************************************
+    //Return all favorite movies from database
+    //*******************************************
+
     public LiveData<List<Movie>> getFavoriteMovies() {
         return favoriteMovies;
     }
 
-    /**
-     * Permet de basculer l'état favori d'un film.
-     *
-     * @param movie Le film dont l'état favori doit être inversé
-     */
+
+
+    //**********************************
+    //Turn a movie into a favorite one
+    //**********************************
+
     public void toggleFavorite(Movie movie) {
         movieRepository.toggleFavorite(movie);
     }
+
+
+    //*********************************************
+    //Check if there are movies left in database
+    //*********************************************
+    public LiveData<Boolean> hasMoreMovies(){
+        return movieRepository.hasMoreMovies();
+    }
+
+
+    //**********************
+    //Close realm instance
+    //**********************
 
     @Override
     protected void onCleared() {

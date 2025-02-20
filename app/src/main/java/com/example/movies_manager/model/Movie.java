@@ -5,6 +5,10 @@ import io.realm.annotations.PrimaryKey;
 
 public class Movie extends RealmObject {
 
+    //***********
+    //Variables
+    //***********
+
     @PrimaryKey
     private int id_title;
     private int popularity;

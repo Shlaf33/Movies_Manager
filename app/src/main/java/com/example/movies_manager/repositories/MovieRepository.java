@@ -23,21 +23,32 @@ import retrofit2.Response;
 
 public class MovieRepository {
 
+    //*****************
+    //Variables
+    //*****************
+
     private static final String API_TOKEN = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI2M2Q0ZTY2MjMzNzU4MzZjNjhkZmIxMmRmODNkNTg3ZSIsIm5iZiI6MTczOTUyMzY4Ni43NDg5OTk4LCJzdWIiOiI2N2FmMDY2NmExOGViZjJhYzU4ZTVmNzIiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.mdHxMj7gwa3s3z-tAKyFNFIhEGC6Isob1Zyrg3Z7DX8";
     private static final String ACCEPT_HEADER = "application/json";
     private MovieApiService movieApiService;
     private Realm realm;
 
     private RealmResults<Movie> favorites;
+    private RealmResults<Movie> movies;
 
+
+    //*****************
+    //Constructor
+    //*****************
     public MovieRepository() {
         movieApiService = RetrofitService.getInstance();
         realm = Realm.getDefaultInstance();
     }
 
+    //*************************************************
     // Méthode pour récupérer les films depuis l'API
-    public LiveData<List<Movie>> getNowPlayingMovies(String language, int page) {
-        MutableLiveData<List<Movie>> liveData = new MutableLiveData<>();
+    //*************************************************
+
+    public void getNowPlayingMovies(String language, int page, Runnable onSuccess) {
 
         movieApiService.getNowPlayingMovies(API_TOKEN, ACCEPT_HEADER, language, page)
                 .enqueue(new Callback<MoviesList>() {
@@ -53,34 +64,29 @@ public class MovieRepository {
                                         r.getTitle(),
                                         r.getOverview(),
                                         r.getPopularity() != null ? r.getPopularity().intValue() : 0,
-                                        "https://image.tmdb.org/t/p/w500"+r.getPoster_path(),
+                                        "https://image.tmdb.org/t/p/w500" + r.getPoster_path(),
                                         r.getRelease_date(),
                                         false
                                 );
                                 movies.add(movie);
                             }
-                            liveData.postValue(movies);
-                            saveMoviesInRealm(movies);
+                            saveMoviesInRealm(movies, onSuccess);
                         } else {
-                            liveData.postValue(null);
                         }
                     }
 
                     @Override
                     public void onFailure(Call<MoviesList> call, Throwable t) {
-                        liveData.postValue(null);
                     }
                 });
 
-        return liveData;
     }
 
-    /**
-     * Sauvegarde la liste des films dans Realm.
-     *
-     * @param movies La liste des films à sauvegarder.
-     */
-    private void saveMoviesInRealm(List<Movie> movies) {
+    //********************************************
+    //Saving movies from web request in database
+    //********************************************
+
+    private void saveMoviesInRealm(List<Movie> movies, Runnable onSuccess) {
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
@@ -94,37 +100,113 @@ public class MovieRepository {
                 }
                 realm.insertOrUpdate(movies);
             }
+        }, new Realm.Transaction.OnSuccess() {
+            @Override
+            public void onSuccess() {
+                if (onSuccess != null) {
+                    onSuccess.run();
+                }
+            }
+        }, new Realm.Transaction.OnError() {
+            @Override
+            public void onError(Throwable error) {
+                Log.e("Repository", "Erreur lors de l'insertion", error);
+            }
         });
     }
 
-    /**
-     * Récupère la liste des films favoris depuis Realm.
-     *
-     * @return Un LiveData contenant la liste des films favoris.
-     */
+    //*********************************
+    //Return all movies from database
+    //*********************************
+
+    public LiveData<List<Movie>> getMoviesFromDatabase() {
+        MutableLiveData<List<Movie>> moviesList = new MutableLiveData<>();
+        movies = realm.where(Movie.class)
+                .findAllAsync();
+        movies.addChangeListener(new RealmChangeListener<RealmResults<Movie>>() {
+            @Override
+            public void onChange(RealmResults<Movie> movies) {
+                moviesList.postValue(realm.copyFromRealm(movies));
+            }
+        });
+        return moviesList;
+    }
+
+    //*********************************************************************************
+    //Return either a movie is favorite or not for updating the UI and display a Toast
+    //*********************************************************************************
+
+    public Boolean isMovieFavorite(Movie movie){
+        Movie manageMovie = realm.where(Movie.class)
+                .equalTo("id_title", movie.getId_title())
+                .findFirst();
+        return manageMovie != null && manageMovie.isFavorite();
+    }
+
+
+    //*******************************************
+    //Return the first 10 movies from database
+    //*******************************************
+
+    public LiveData<List<Movie>> getTenMoviesFromDatabase() {
+        MutableLiveData<List<Movie>> moviesLiveData = new MutableLiveData<>();
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                RealmResults<Movie> results = realm.where(Movie.class)
+                        .limit(10)
+                        .findAll(); // Requête synchrone dans la transaction
+                List<Movie> movies = realm.copyFromRealm(results);
+                moviesLiveData.postValue(movies);
+            }
+        });
+        return moviesLiveData;
+    }
+
+    //******************************
+    //Delete a movie from database
+    //******************************
+
+    public void deleteMovie(Movie movie){
+
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                Movie managedMovie = realm.where(Movie.class)
+                        .equalTo("id_title", movie.getId_title())
+                        .findFirst();
+                if(managedMovie!=null){
+                    managedMovie.deleteFromRealm();
+                }
+            }
+        });
+    }
+
+    //********************************************
+    //Return all favorite movies from database
+    //********************************************
+
     public LiveData<List<Movie>> getFavoriteMovies() {
-        MutableLiveData<List<Movie>> liveData = new MutableLiveData<>();
-        Realm realmLocal = Realm.getDefaultInstance();
-        favorites = realmLocal.where(Movie.class)
+        MutableLiveData<List<Movie>> favList = new MutableLiveData<>();
+        favorites = realm.where(Movie.class)
                 .equalTo("isFavorite", true)
                 .findAllAsync();
         favorites.addChangeListener(new RealmChangeListener<RealmResults<Movie>>() {
             @Override
             public void onChange(RealmResults<Movie> movies) {
                 Log.d("MovieRepository", "Favorites changed, count: " + movies.size());
-                Log.d("RealmCheck", "Is realm closed? " + realmLocal.isClosed());
-                liveData.postValue(realmLocal.copyFromRealm(movies));
+                Log.d("RealmCheck", "Is realm closed? " + realm.isClosed());
+                favList.postValue(realm.copyFromRealm(movies));
 
             }
         });
-        return liveData;
+        return favList;
     }
 
-    /**
-     * Bascule le statut favori d'un film.
-     *
-     * @param movie Le film dont le statut doit être modifié.
-     */
+    //************************************
+    //Turn a movie into a favorite one
+    //************************************
+
     public void toggleFavorite(final Movie movie) {
         Log.d("RealmCheck", "Is realm closed while addFav? " + realm.isClosed());
         Log.d("MovieRepository", "Movie is favorite : " + movie.isFavorite());
@@ -155,9 +237,23 @@ public class MovieRepository {
         });
     }
 
-    /**
-     * Ferme l'instance Realm. À appeler lors du nettoyage (ex. onCleared() du ViewModel).
-     */
+    //********************************************
+    //Check if there is movies left in database
+    //********************************************
+
+    public LiveData<Boolean> hasMoreMovies(){
+        MutableLiveData<Boolean> hasMoreMovies = new MutableLiveData<>();
+        realm.executeTransactionAsync(realm -> {
+            long count = realm.where(Movie.class).count();
+            hasMoreMovies.postValue(count>0);
+        });
+        return hasMoreMovies;
+    }
+
+    //**********************
+    //Close realm instance
+    //**********************
+
     public void close() {
         if (realm != null && !realm.isClosed()) {
             realm.close();

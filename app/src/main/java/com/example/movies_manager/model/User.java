@@ -2,7 +2,9 @@ package com.example.movies_manager.model;
 
 import java.util.Date;
 
-public class User {
+import io.realm.RealmObject;
+
+public class User extends RealmObject {
 
     private int id, session_id, guest_session_id;
     private String username;
