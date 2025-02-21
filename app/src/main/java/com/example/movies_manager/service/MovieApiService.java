@@ -10,7 +10,7 @@ import retrofit2.http.Query;
 public interface MovieApiService {
 
     @GET("3/movie/popular")
-    Call<MoviesList> getNowPlayingMovies(
+    Call<MoviesList> getPopularMovies(
             @Header("Authorization") String authToken,
             @Header("accept") String accept,
             @Query("language") String language,

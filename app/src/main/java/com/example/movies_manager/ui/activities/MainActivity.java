@@ -1,4 +1,4 @@
-package com.example.movies_manager;
+package com.example.movies_manager.ui.activities;
 
 import android.os.Bundle;
 
@@ -6,7 +6,10 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.example.movies_manager.R;
 import com.example.movies_manager.adapter.MoviesPagerAdapter;
+import com.example.movies_manager.model.User;
+import com.example.movies_manager.repositories.MovieRepository;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
@@ -15,12 +18,20 @@ public class MainActivity extends AppCompatActivity {
     private MoviesPagerAdapter moviesPagerAdapter;
     private ViewPager2 viewPager;
     private TabLayout tabLayout;
+    String userId;
+
+    private MovieRepository movieRepository;
+
+    User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_movies_list);
+        movieRepository = new MovieRepository();
+        userId = getIntent().getStringExtra("userId");;
+        user = movieRepository.getUserWithId(userId);
 
 
         viewPager = findViewById(R.id.viewPager);
@@ -44,6 +55,5 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }).attach();
     }
-
 
 }

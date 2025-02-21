@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.movies_manager.model.Movie;
+import com.example.movies_manager.model.User;
 import com.example.movies_manager.pojo.moviesList.MoviesList;
 import com.example.movies_manager.pojo.moviesList.Result;
 import com.example.movies_manager.service.MovieApiService;
@@ -40,17 +41,17 @@ public class MovieRepository {
     //Constructor
     //*****************
     public MovieRepository() {
-        movieApiService = RetrofitService.getInstance();
+        movieApiService = RetrofitService.getMovieApiInstance();
         realm = Realm.getDefaultInstance();
     }
 
     //*************************************************
-    // Méthode pour récupérer les films depuis l'API
+    // Get popular movies from themoviedb.org
     //*************************************************
 
-    public void getNowPlayingMovies(String language, int page, Runnable onSuccess) {
+    public void getPopularMovies(String language, int page, Runnable onSuccess) {
 
-        movieApiService.getNowPlayingMovies(API_TOKEN, ACCEPT_HEADER, language, page)
+        movieApiService.getPopularMovies(API_TOKEN, ACCEPT_HEADER, language, page)
                 .enqueue(new Callback<MoviesList>() {
                     @Override
                     public void onResponse(Call<MoviesList> call, Response<MoviesList> response) {
@@ -71,7 +72,6 @@ public class MovieRepository {
                                 movies.add(movie);
                             }
                             saveMoviesInRealm(movies, onSuccess);
-                        } else {
                         }
                     }
 
@@ -248,6 +248,16 @@ public class MovieRepository {
             hasMoreMovies.postValue(count>0);
         });
         return hasMoreMovies;
+    }
+
+    //**************************************
+    //Return the user that has the same ID
+    //**************************************
+
+    public User getUserWithId(String userId){
+        return realm.where(User.class)
+                .equalTo("id", userId)
+                .findFirst();
     }
 
     //**********************

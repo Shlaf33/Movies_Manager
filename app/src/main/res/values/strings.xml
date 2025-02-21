@@ -9,9 +9,13 @@
     <string name="notify_menu_button">Notify</string>
     <string name="profile_menu_button">Profile</string>
     <string name="login">Login</string>
-    <string name="selectUser">Select User</string>
-    <string name="createUser">Sign in</string>
+    <string name="User">Registered User</string>
+    <string name="createUser">Create user</string>
     <string name="enterName">Enter a user name</string>
+    <string name="Continue">Continuer</string>
+    <string name="userNeeded">You need to create a user</string>
+    <string name="guestLogin">Login as guest</string>
+    <string name="themoviedb">Powered by themoviedb.org</string>
 
 
 

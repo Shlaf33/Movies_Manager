@@ -1,8 +1,5 @@
 package com.example.movies_manager.viewModel;
 
-import android.os.Handler;
-import android.os.Looper;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -53,8 +50,8 @@ public class MovieViewModel extends ViewModel {
     // Méthode pour récupérer les films depuis l'API
     //*************************************************
 
-    public void getNowPlayingMovies() {
-        movieRepository.getNowPlayingMovies("fr-FR",1, () -> {
+    public void getPopularMovies() {
+        movieRepository.getPopularMovies("fr-FR",1, () -> {
             dataLoaded.postValue(true);
         });
 

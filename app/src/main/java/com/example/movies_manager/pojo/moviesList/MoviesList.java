@@ -11,9 +11,9 @@ public class MoviesList {
     private Integer total_results;
 
 
-    //*********************
-    //Pojo Getter and Setter
-    //*********************
+    //*************************
+    //Pojo Getters and Setters
+    //*************************
 
     public Dates getDates() {
         return dates;

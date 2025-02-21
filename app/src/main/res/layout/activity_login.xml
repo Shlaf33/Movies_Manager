@@ -51,31 +51,41 @@
             android:layout_gravity="center_horizontal"
             android:layout_margin="8dp"
             android:layout_weight="1"
+            android:fontFamily="serif"
             android:text="@string/app_name"
             android:textColor="@color/white"
             android:textSize="34sp" />
 
         <TextView
-            android:id="@+id/textView4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="8dp"
+            android:layout_weight="1"
+            android:fontFamily="casual"
+            android:text="@string/themoviedb"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold|italic" />
+
+        <TextView
+            android:id="@+id/tv_user"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/selectUser"
+            android:text="@string/User"
             android:textColor="@color/white"
             android:textSize="18sp"/>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tv_choose_user"
+        <TextView
+            android:id="@+id/tv_select_user"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:layout_margin="8dp"
-            android:layout_weight="1">
+            android:textColor="@color/white">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/selectUser" />
-        </com.google.android.material.textfield.TextInputLayout>
+        </TextView>
 
         <Button
             android:id="@+id/bt_login"
@@ -88,6 +98,18 @@
             android:text="@string/login" />
 
         <TextView
+            android:id="@+id/tv_login_guest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="8dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:text="@string/guestLogin"
+            android:textColor="@color/blue_sign_in"
+            android:textSize="14sp" />
+
+        <TextView
             android:id="@+id/tv_create_user"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -97,7 +119,7 @@
             android:clickable="true"
             android:text="@string/createUser"
             android:textColor="@color/blue_sign_in"
-            android:textSize="14sp"/>
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/tv_enter_name"
@@ -110,19 +132,19 @@
             android:layout_gravity="center_horizontal"
             android:visibility="invisible"/>
 
-        <com.google.android.material.textfield.TextInputLayout
+        <EditText
             android:id="@+id/et_user_name"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="8dp"
+            android:layout_height="wrap_content"
+            android:autofillHints=""
+            android:hint="@string/enterName"
+            android:inputType="text"
+            android:visibility="invisible"
             android:layout_weight="1"
-            android:visibility="invisible">
+            android:layout_margin="8dp"
+            android:textColor="@color/white">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/enterName" />
-        </com.google.android.material.textfield.TextInputLayout>
+        </EditText>
 
         <Button
             android:id="@+id/bt_create_user"

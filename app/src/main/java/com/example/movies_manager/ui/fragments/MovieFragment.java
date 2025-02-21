@@ -87,7 +87,7 @@ public class MovieFragment extends Fragment implements MoviesAdapter.OnMovieList
         fabAddMovies.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                movieViewModel.getNowPlayingMovies();
+                movieViewModel.getPopularMovies();
                 Toast.makeText(getContext(), "Loading movies from themoviedb.org", Toast.LENGTH_SHORT).show();
                 movieViewModel.getDataLoaded().observe(getViewLifecycleOwner(), loaded -> {
                     if (loaded != null && loaded) {
@@ -129,6 +129,7 @@ public class MovieFragment extends Fragment implements MoviesAdapter.OnMovieList
         movieViewModel.deleteMovieFromDatabase(movie);
         adapter.removeMovie(movie);
         if (adapter.getItemCount() == 0) {
+            Toast.makeText(getContext(), "Loading ten more movies", Toast.LENGTH_SHORT).show();
             observeMovieData();
         }
 
