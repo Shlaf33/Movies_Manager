@@ -67,6 +67,8 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
 
         Movie movie = moviesList.get(position);
         holder.bind(movie);
+        int movieNumber = position+1;
+        holder.tv_movie_number.setText(""+movieNumber);
 
         onDeleteClickMovieListener = new View.OnClickListener() {
             @Override
@@ -109,7 +111,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
         //***************
         private final ImageView iv_movie_image;
         private final ImageButton ib_favorite, ib_share, ib_comment, ib_options;
-        private final TextView tv_movie_title, tv_release_date, tv_popularity, tv_overview_text;
+        private final TextView tv_movie_title, tv_release_date, tv_popularity, tv_overview_text, tv_movie_number;
 
         //***************************
         //ViewHolder initialisation
@@ -122,6 +124,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
             tv_release_date = itemView.findViewById(R.id.tv_release_date);
             tv_popularity = itemView.findViewById(R.id.tv_popularity);
             tv_overview_text = itemView.findViewById(R.id.tv_overview_text);
+            tv_movie_number = itemView.findViewById(R.id.tv_movie_number);
             ib_favorite = itemView.findViewById(R.id.ib_favorite);
             ib_comment = itemView.findViewById(R.id.ib_comment);
             ib_share = itemView.findViewById(R.id.ib_share);
@@ -159,7 +162,6 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
             }
             if (movie.getOverview() == null || Objects.equals(movie.getOverview(), "")) {
                 tv_overview_text.setText("Overview unknown");
-                tv_overview_text.setTypeface(null, Typeface.BOLD_ITALIC);
             } else {
                 tv_overview_text.setText(movie.getOverview());
             }
@@ -178,7 +180,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     //***************************************************
 
     public void updateMovies(List<Movie> movies) {
-        this.moviesList.clear();
+        //this.moviesList.clear();
         this.moviesList.addAll(movies);
         notifyDataSetChanged();
     }

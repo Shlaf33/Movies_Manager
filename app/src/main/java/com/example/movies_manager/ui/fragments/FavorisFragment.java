@@ -1,6 +1,7 @@
 package com.example.movies_manager.ui.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +15,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.movies_manager.R;
 import com.example.movies_manager.adapter.FavoriteAdapter;
-import com.example.movies_manager.adapter.MoviesAdapter;
-import com.example.movies_manager.model.Movie;
 import com.example.movies_manager.viewModel.MovieViewModel;
 
 public class FavorisFragment extends Fragment {
@@ -24,7 +23,10 @@ public class FavorisFragment extends Fragment {
     private MovieViewModel movieViewModel;
     private FavoriteAdapter adapter;
 
-    public static FavorisFragment newInstance(){
+    int accountId;
+    String sessionId;
+
+    public static FavorisFragment newInstance() {
         FavorisFragment favorisFragment = new FavorisFragment();
         return favorisFragment;
     }
@@ -49,6 +51,31 @@ public class FavorisFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         movieViewModel = new ViewModelProvider(requireActivity()).get(MovieViewModel.class);
+
+        //**************************************************************************
+        //Get the account details before saving user favorite movies into database
+        //**************************************************************************
+
+        movieViewModel.getUserLiveData().observe(getViewLifecycleOwner(), user -> {
+            if (user != null) {
+                Log.d("UserData", user.getSessionId());
+                sessionId = user.getSessionId();
+                accountId = user.getId();
+                movieViewModel.getUserFavoriteMovie(accountId, "fr-FR", 1, sessionId).observe(getViewLifecycleOwner(), resultList -> {
+                    if (resultList != null && !resultList.isEmpty()) {
+                        Log.d("ResultList", "not null" + resultList);
+                        movieViewModel.turnUserFavMovieInDatabase(resultList);
+                    } else {
+                        Log.d("ResultList", "null" + sessionId + accountId);
+                    }
+                });
+            }
+        });
+
+        //******************************************************************
+        //Get the favorite movies from database and display them in adapter
+        //******************************************************************
+
         movieViewModel.getFavoriteMovies().observe(getViewLifecycleOwner(), movies -> {
             if (movies != null) {
                 adapter.updateFavMovies(movies);

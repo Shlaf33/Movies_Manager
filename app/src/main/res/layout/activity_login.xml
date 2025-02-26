@@ -109,43 +109,6 @@
             android:textColor="@color/blue_sign_in"
             android:textSize="14sp" />
 
-        <TextView
-            android:id="@+id/tv_create_user"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_margin="8dp"
-            android:layout_weight="1"
-            android:clickable="true"
-            android:text="@string/createUser"
-            android:textColor="@color/blue_sign_in"
-            android:textSize="14sp" />
-
-        <TextView
-            android:id="@+id/tv_enter_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/enterName"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            android:layout_gravity="center_horizontal"
-            android:visibility="invisible"/>
-
-        <EditText
-            android:id="@+id/et_user_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:autofillHints=""
-            android:hint="@string/enterName"
-            android:inputType="text"
-            android:visibility="invisible"
-            android:layout_weight="1"
-            android:layout_margin="8dp"
-            android:textColor="@color/white">
-
-        </EditText>
-
         <Button
             android:id="@+id/bt_create_user"
             android:layout_width="wrap_content"
@@ -153,8 +116,9 @@
             android:layout_gravity="center_horizontal"
             android:layout_margin="8dp"
             android:layout_weight="1"
-            android:text="@string/createUser"
-            android:visibility="invisible" />
+            android:text="@string/connexion"
+            android:visibility="invisible"
+            android:backgroundTint="@color/button_background"/>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

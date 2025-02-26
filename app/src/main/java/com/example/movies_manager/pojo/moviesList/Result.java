@@ -1,6 +1,5 @@
 package com.example.movies_manager.pojo.moviesList;
 
-import java.util.List;
 
 public class Result {
     private Integer id;

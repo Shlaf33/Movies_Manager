@@ -4,15 +4,15 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.movies_manager.model.User;
+import com.example.movies_manager.pojo.authenticate.AccountDetail;
 import com.example.movies_manager.pojo.authenticate.SessionRequest;
-import com.example.movies_manager.pojo.authenticate.SessionResponse;
+import com.example.movies_manager.pojo.authenticate.SessionUserResponse;
 import com.example.movies_manager.pojo.authenticate.Token;
 import com.example.movies_manager.service.RetrofitService;
 import com.example.movies_manager.service.TokenCallback;
 import com.example.movies_manager.service.UserApiService;
 
 import io.realm.Realm;
-import io.realm.RealmResults;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -72,7 +72,7 @@ public class AuthUserRepository {
     //Create user session after approval
     //************************************
 
-    public void createSession(String requestToken, Callback<SessionResponse> callback) {
+    public void createSession(String requestToken, Callback<SessionUserResponse> callback) {
         SessionRequest request = new SessionRequest(requestToken);
         userApiService.createSession(API_TOKEN, ACCEPT_HEADER, ACCEPT_HEADER,request).enqueue(callback);
     }
@@ -93,17 +93,14 @@ public class AuthUserRepository {
     //Return the existing user from database
     //***************************************
 
-    private void loadUserFromDatabase() {
+    public LiveData<User> loadUserFromDatabase() {
         realm.where(User.class).findAllAsync().addChangeListener(users -> {
             if (!users.isEmpty()) {
-                userLiveData.postValue(users.first()); // Met à jour en arrière-plan
+                userLiveData.postValue(realm.copyFromRealm(users.first())); // Met à jour en arrière-plan
             } else {
                 userLiveData.postValue(null);
             }
         });
-    }
-
-    public LiveData<User> getUser() {
         return userLiveData;
     }
 
@@ -114,8 +111,16 @@ public class AuthUserRepository {
 
     public void createUserInDatabase(User user) {
         realm.executeTransactionAsync(r -> r.insertOrUpdate(user), () -> {
-            loadUserFromDatabase(); // Met à jour LiveData après insertion
+            loadUserFromDatabase();
         });
+    }
+
+    //************************************************************
+    //Get the user account details once the session is approved
+    //************************************************************
+
+    public void getAccountId(String sessionId, Callback<AccountDetail> callback){
+        userApiService.getAccountId(API_TOKEN, ACCEPT_HEADER, sessionId).enqueue(callback);
     }
 
 

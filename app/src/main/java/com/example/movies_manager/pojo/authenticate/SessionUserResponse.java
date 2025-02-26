@@ -3,7 +3,7 @@ package com.example.movies_manager.pojo.authenticate;
 
 import com.google.gson.annotations.SerializedName;
 
-public class SessionResponse {
+public class SessionUserResponse {
 
     //***************
     //Pojo variables

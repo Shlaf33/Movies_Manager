@@ -19,7 +19,9 @@
         android:text="@string/Continue"
         android:layout_gravity="center_horizontal"
         android:layout_margin="16dp"
-        android:visibility="invisible">
+        android:visibility="invisible"
+        android:backgroundTint="@color/button_background"
+        android:textColor="@color/white">
     </Button>
 
 

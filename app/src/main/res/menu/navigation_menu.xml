@@ -16,7 +16,7 @@
     <item
         android:id="@+id/notify"
         android:title="@string/notify_menu_button"
-        android:icon="@drawable/baseline_notifications_none_24"/>
+        android:icon="@drawable/baseline_notifications_none_24" />
     <item
         android:id="@+id/profil"
         android:title="@string/profile_menu_button"

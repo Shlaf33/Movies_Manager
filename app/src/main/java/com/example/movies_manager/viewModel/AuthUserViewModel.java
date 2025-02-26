@@ -1,11 +1,11 @@
 package com.example.movies_manager.viewModel;
 
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.movies_manager.model.User;
-import com.example.movies_manager.pojo.authenticate.SessionResponse;
+import com.example.movies_manager.pojo.authenticate.AccountDetail;
+import com.example.movies_manager.pojo.authenticate.SessionUserResponse;
 import com.example.movies_manager.repositories.AuthUserRepository;
 import com.example.movies_manager.service.TokenCallback;
 
@@ -52,8 +52,16 @@ public class AuthUserViewModel extends ViewModel {
     //Create user session after approval
     //************************************
 
-    public void createSession(String requestToken, Callback<SessionResponse> callback){
+    public void createSession(String requestToken, Callback<SessionUserResponse> callback){
         authUserRepository.createSession(requestToken,callback);
+    }
+
+    //*********************************************************
+    //Get the accountId from user once the session is approved
+    //*********************************************************
+
+    public void getAccountId(String sessionId, Callback<AccountDetail> callback){
+        authUserRepository.getAccountId(sessionId, callback);
     }
 
 
@@ -63,7 +71,15 @@ public class AuthUserViewModel extends ViewModel {
 
 
     public LiveData<User> getUser() {
-        return authUserRepository.getUser();
+        return authUserRepository.loadUserFromDatabase();
+    }
+
+
+    //******************************************
+    //Refresh user in case it has been deleted
+    //******************************************
+    public void refreshUser(){
+        authUserRepository.loadUserFromDatabase();
     }
 
 

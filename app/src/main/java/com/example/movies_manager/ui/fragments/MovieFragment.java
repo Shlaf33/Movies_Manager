@@ -1,6 +1,7 @@
 package com.example.movies_manager.ui.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,11 @@ public class MovieFragment extends Fragment implements MoviesAdapter.OnMovieList
     private MovieViewModel movieViewModel;
     private MoviesAdapter adapter;
     private FloatingActionButton fabAddMovies;
+
+    int accountId;
+    String sessionId;
+    int offset = 0;
+    int limit = 10;
 
 
     //************************
@@ -73,37 +79,71 @@ public class MovieFragment extends Fragment implements MoviesAdapter.OnMovieList
         movieViewModel = new ViewModelProvider(requireActivity()).get(MovieViewModel.class);
         fabAddMovies = view.findViewById(R.id.fab_movies);
 
-        //********************************************************
-        //Load movies in adapter if there are any in database
-        //********************************************************
+        //*******************************************
+        //Retrieving user account data from activity
+        //*******************************************
+        movieViewModel.getUserLiveData().observe(getViewLifecycleOwner(), user ->{
+            if(user!=null){
+                Log.d("UserData", user.getSessionId());
+                sessionId = user.getSessionId();
+                accountId = user.getId();
+                movieViewModel.getUserFavoriteMovie(accountId, "fr-FR", 1, sessionId).observe(getViewLifecycleOwner(), resultList -> {
+                    if (resultList != null && !resultList.isEmpty()) {
+                        Log.d("ResultList", "not null" + resultList);
+                        movieViewModel.turnUserFavMovieInDatabase(resultList);
+                    } else {
+                        Log.d("ResultList", "null" + sessionId + accountId);
+                    }
+                });
+            }
+        });
 
-        observeMovieData();
+        //**************************************************************************************************************
+        //Load movies in adapter if there are any in database otherwise call web request to fetch database with movies
+        //**************************************************************************************************************
 
+        if(movieViewModel.isThereMoviesLeft()){
+            observeMovieData(offset, limit);
+        }
+        else{
+           loadMoviesFromWeb();
+        }
 
-        //******************************************************************************
-        //Making sure movies have been saved in database before loading them in adapter
-        //******************************************************************************
+        //*********************************************************************
+        //Make sure the movies are saved in database before updating adapter
+        //*********************************************************************
+
+        movieViewModel.getDataLoaded().observe(getViewLifecycleOwner(), loaded -> {
+            Log.v("Loaded data", String.valueOf(loaded));
+            if (loaded) {
+                observeMovieData(offset, limit);
+
+            }
+            else{
+                loadMoviesFromWeb();
+            }
+        });
+
+        //**************************************************
+        //Load the next ten movies from database in adapter
+        //**************************************************
 
         fabAddMovies.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                movieViewModel.getPopularMovies();
-                Toast.makeText(getContext(), "Loading movies from themoviedb.org", Toast.LENGTH_SHORT).show();
-                movieViewModel.getDataLoaded().observe(getViewLifecycleOwner(), loaded -> {
-                    if (loaded != null && loaded) {
-                        observeMovieData();
-                    }
-                });
-
+                offset += 10;
+                limit = 10;
+                observeMovieData(offset, limit);
             }
         });
 
     }
 
 
-    //***********************************************************************************************************************
-    // Check either a movie is favorite or not, display a Toast and updating fav icon before changing its value in database
-    //***********************************************************************************************************************
+
+    //******************************************************************************************************************************************
+    // Check either a movie is favorite or not, display a Toast and updating fav icon before changing its value in database and in user account
+    //******************************************************************************************************************************************
 
     @Override
     public void onAddFavClick(Movie movie) {
@@ -112,10 +152,12 @@ public class MovieFragment extends Fragment implements MoviesAdapter.OnMovieList
             Toast.makeText(getContext(), movie.getTitle() + " ajouté au favoris", Toast.LENGTH_SHORT).show();
             adapter.changeFavoriteIcon(movie.getId_title(), true);
             movieViewModel.toggleFavorite(movie);
+            movieViewModel.postFavoriteMovie(movie, accountId, sessionId, true);
         } else {
-            Toast.makeText(getContext(), movie.getTitle() + " supprimer des favoris", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), movie.getTitle() + " supprimé des favoris", Toast.LENGTH_SHORT).show();
             adapter.changeFavoriteIcon(movie.getId_title(), false);
             movieViewModel.toggleFavorite(movie);
+            movieViewModel.postFavoriteMovie(movie, accountId, sessionId, false);
         }
     }
 
@@ -128,25 +170,30 @@ public class MovieFragment extends Fragment implements MoviesAdapter.OnMovieList
     public void onDeleteClick(Movie movie) {
         movieViewModel.deleteMovieFromDatabase(movie);
         adapter.removeMovie(movie);
-        if (adapter.getItemCount() == 0) {
+        if (adapter.getItemCount() == 0 ) {
             Toast.makeText(getContext(), "Loading ten more movies", Toast.LENGTH_SHORT).show();
-            observeMovieData();
+            observeMovieData(0, 10);
         }
 
     }
 
 
     //**********************************************************************************************************
-    //Observe movies in database and display them in adapter or displaying a Toast when no more movies available
+    //Observe movies in database and display them in adapter or display a Toast when no more movies available
     //**********************************************************************************************************
 
-    public void observeMovieData() {
-        movieViewModel.getTenMoviesFromDatabase().observe(getViewLifecycleOwner(), movies -> {
+    public void observeMovieData(int offset, int limit) {
+        movieViewModel.getTenMoviesFromDatabase(offset,limit).observe(getViewLifecycleOwner(), movies -> {
             if (movies != null && !movies.isEmpty()) {
                 adapter.updateMovies(movies);
             } else {
-                Toast.makeText(getContext(), "No more movies in database", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "No more movies to load from database", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public void loadMoviesFromWeb(){
+        movieViewModel.getPopularMovies(3);
+        Toast.makeText(getContext(), "Loading movies from themoviedb.org", Toast.LENGTH_SHORT).show();
     }
 }

@@ -1,11 +1,14 @@
 package com.example.movies_manager.pojo.moviesList;
 
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 
 public class MoviesList {
 
-    private Dates dates;
+    private Integer page;
+    @SerializedName("results")
     private List<Result> results;
     private Integer total_pages;
     private Integer total_results;
@@ -15,12 +18,13 @@ public class MoviesList {
     //Pojo Getters and Setters
     //*************************
 
-    public Dates getDates() {
-        return dates;
+
+    public Integer getPage() {
+        return page;
     }
 
-    public void setDates(Dates dates) {
-        this.dates = dates;
+    public void setPage(Integer page) {
+        this.page = page;
     }
 
     public List<Result> getResults() {

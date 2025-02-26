@@ -1,10 +1,15 @@
 package com.example.movies_manager.viewModel;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.movies_manager.model.Movie;
+import com.example.movies_manager.model.User;
+import com.example.movies_manager.pojo.moviesList.FavoriteRequest;
+import com.example.movies_manager.pojo.moviesList.Result;
 import com.example.movies_manager.repositories.MovieRepository;
 
 import java.util.List;
@@ -23,6 +28,9 @@ public class MovieViewModel extends ViewModel {
     private final MutableLiveData<List<Movie>> moviesLiveData = new MutableLiveData<>();
 
     private final MutableLiveData<Boolean> dataLoaded = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> userDeleted = new MutableLiveData<>();
+
+    private LiveData<User>  userLiveData;
 
 
 
@@ -34,13 +42,6 @@ public class MovieViewModel extends ViewModel {
     public MovieViewModel() {
         movieRepository = new MovieRepository();
         favoriteMovies = movieRepository.getFavoriteMovies();
-        dataLoaded.observeForever(loaded -> {
-            if (loaded != null && loaded) {
-                movieRepository.getTenMoviesFromDatabase().observeForever(movies -> {
-                    moviesLiveData.postValue(movies);
-                });
-            }
-        });
     }
 
 
@@ -50,10 +51,18 @@ public class MovieViewModel extends ViewModel {
     // Méthode pour récupérer les films depuis l'API
     //*************************************************
 
-    public void getPopularMovies() {
-        movieRepository.getPopularMovies("fr-FR",1, () -> {
-            dataLoaded.postValue(true);
-        });
+    public void getPopularMovies(int totalPages) {
+
+        for(int page = 1; page<=totalPages; page++){
+            int finalPage = page;
+            movieRepository.getPopularMovies("fr-FR",finalPage, () -> {
+                Log.v("Loaded Data", "true");
+                if(finalPage ==totalPages){
+                    dataLoaded.postValue(true);
+                }
+            });
+        }
+
 
     }
 
@@ -61,13 +70,26 @@ public class MovieViewModel extends ViewModel {
         return dataLoaded;
     }
 
+    //*********************************************
+    //Check if there are movies left in database
+    //*********************************************
+
+    public Boolean isThereMoviesLeft(){
+        return movieRepository.isThereMoviesLeft();
+    }
+
+
     //********************************************
     //Return the first 10 movies from database
     //********************************************
 
-    public LiveData<List<Movie>> getTenMoviesFromDatabase(){
-        moviesFromDatabase = movieRepository.getTenMoviesFromDatabase();
+    public LiveData<List<Movie>> getTenMoviesFromDatabase(final int offset, final int limit){
+        moviesFromDatabase = movieRepository.getTenMoviesFromDatabase(offset, limit);
         return moviesFromDatabase;
+    }
+
+    public MutableLiveData<List<Movie>> getLiveData(){
+        return moviesLiveData;
     }
 
 
@@ -109,12 +131,53 @@ public class MovieViewModel extends ViewModel {
     }
 
 
-    //*********************************************
-    //Check if there are movies left in database
-    //*********************************************
-    public LiveData<Boolean> hasMoreMovies(){
-        return movieRepository.hasMoreMovies();
+    //**************************************
+    //Return the user that has the same ID
+    //**************************************
+
+    public LiveData<User> getUserById(int userId){
+        userLiveData = movieRepository.getUserById(userId);
+        return movieRepository.getUserById(userId);
     }
+
+    public LiveData<User> getUserLiveData(){
+        return userLiveData;
+    }
+
+    //********************************************
+    //Post a favorite movie onto the user account
+    //********************************************
+
+    public void postFavoriteMovie(Movie movie, int accountId, String sessionId, boolean isFav){
+        movieRepository.postFavoriteMovie(movie, accountId,sessionId, isFav);
+    }
+
+    //***********************************************************
+    //Get the user favorite movies list session from themoviedb
+    //***********************************************************
+
+    public LiveData<List<Result>> getUserFavoriteMovie(int accountId, String language, int page, String sessionId) {
+        return movieRepository.getUserFavoriteMovie(accountId, language, page,sessionId);
+    }
+
+
+    //***************************************
+    //Turn user favorite movie into database
+    //***************************************
+
+    public void turnUserFavMovieInDatabase(List<Result> resultList){
+        movieRepository.turnUserFavMovieInDatabase(resultList);
+    }
+
+    //***************************
+    //Delete user from database
+    //***************************
+    public LiveData<Boolean> deleteUserFromDatabase(int userId){
+        movieRepository.deleteUserFromDatabase(userId, () ->
+               userDeleted.postValue(true) );
+        return userDeleted;
+    }
+
 
 
     //**********************

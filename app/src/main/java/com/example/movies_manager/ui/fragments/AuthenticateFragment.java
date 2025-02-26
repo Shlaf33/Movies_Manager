@@ -2,7 +2,6 @@ package com.example.movies_manager.ui.fragments;
 
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +17,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.movies_manager.R;
-import com.example.movies_manager.pojo.authenticate.SessionResponse;
+import com.example.movies_manager.pojo.authenticate.SessionUserResponse;
 import com.example.movies_manager.repositories.AuthUserRepository;
 
 import retrofit2.Call;
@@ -110,12 +109,11 @@ public class AuthenticateFragment extends DialogFragment {
     //Method that throw the session_id get from web request
     //********************************************************
     private void createSession() {
-        // Appeler l'endpoint de création de session avec le token validé (approvedToken)
-        // Par exemple, via Retrofit dans votre AuthUserRepository
+
         AuthUserRepository repo = new AuthUserRepository();
-        repo.createSession(approvedToken, new Callback<SessionResponse>() {
+        repo.createSession(approvedToken, new Callback<SessionUserResponse>() {
             @Override
-            public void onResponse(Call<SessionResponse> call, Response<SessionResponse> response) {
+            public void onResponse(Call<SessionUserResponse> call, Response<SessionUserResponse> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                     String sessionId = response.body().getSessionId();
                     if (authListener != null) {
@@ -127,7 +125,7 @@ public class AuthenticateFragment extends DialogFragment {
                 }
             }
             @Override
-            public void onFailure(Call<SessionResponse> call, Throwable t) {
+            public void onFailure(Call<SessionUserResponse> call, Throwable t) {
                 Toast.makeText(getContext(), "Erreur réseau", Toast.LENGTH_SHORT).show();
             }
         });
