@@ -1,3 +1,39 @@
 <resources>
     <string name="app_name">Movies_Manager</string>
+    <string name="title">Movies Manager</string>
+
+    //View Menu Title
+    <string name="home_button">Home</string>
+    <string name="search_button">Search</string>
+    <string name="comment_menu_button">Comment</string>
+    <string name="notify_menu_button">Notify</string>
+    <string name="profile_menu_button">Profile</string>
+    <string name="login">Let\'s go</string>
+    <string name="User">Registered User</string>
+    <string name="createUser">Create user</string>
+    <string name="connexion">Connexion</string>
+    <string name="enterName">Enter a user name</string>
+    <string name="Continue">Continue</string>
+    <string name="userNeeded">You need to create a user or log as guest</string>
+    <string name="guestLogin">Login as guest</string>
+    <string name="themoviedb">Powered by themoviedb.org</string>
+    <string name="guest">Guest</string>
+
+
+
+    //Content description Text
+    <string name="app_logo">App logo</string>
+    <string name="comment_button">Comment</string>
+    <string name="option_button">Options</string>
+    <string name="share_button">Share</string>
+    <string name="favorite_button">Favorite</string>
+    <string name="movie_image">Movie image</string>
+    <string name="add_Button_Description">Add Movies</string>
+    <string name="films">Movies</string>
+    <string name="favoris">Favorite</string>
+    <string name="movie_title">Movie Title</string>
+    <string name="movie_release_date">Release date</string>
+    <string name="movie_popularity">Popularity</string>
+    <string name="movie_overview">Overview</string>
+    <string name="movie_overview_text">Overview Text</string>
 </resources>

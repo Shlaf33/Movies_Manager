@@ -1,3 +1,4 @@
+
 plugins {
     alias(libs.plugins.android.application)
     id 'org.jetbrains.kotlin.android'
@@ -11,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.movies_manager"
-        minSdk 35
+        minSdk 26
         targetSdk 35
         versionCode 1
         versionName "1.0"
@@ -25,6 +26,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    buildFeatures {
+        viewBinding true
+    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
@@ -37,8 +41,29 @@ android {
 dependencies {
 
     //Realm Database
-    implementation 'io.realm:realm-gradle-plugin:10.10.1'
-    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation libs.realm.gradle.plugin.v10101
+    implementation libs.core.ktx
+    testImplementation libs.ext.junit
+
+    //OkHTTP
+    implementation libs.okhttp
+    implementation platform(libs.okhttp.bom)
+    testImplementation libs.mockwebserver
+
+    // Define any required OkHttp artifacts without version
+    implementation(libs.okhttp3.okhttp)
+    implementation(libs.logging.interceptor)
+
+    //Glide
+    implementation libs.glide
+
+    //Retrofit
+    implementation libs.retrofit
+    implementation libs.converter.gson
+
+    //VIEW MODEL & LIVE DATA
+
+    implementation libs.lifecycle.extensions
 
     //Android Libs
     implementation libs.appcompat
@@ -48,6 +73,7 @@ dependencies {
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
+
 }
 realm {
     syncEnabled = true
