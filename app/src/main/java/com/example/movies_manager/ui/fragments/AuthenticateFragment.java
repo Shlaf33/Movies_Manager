@@ -15,10 +15,11 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.movies_manager.R;
 import com.example.movies_manager.pojo.authenticate.SessionUserResponse;
-import com.example.movies_manager.repositories.AuthUserRepository;
+import com.example.movies_manager.viewModel.AuthUserViewModel;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -35,11 +36,12 @@ public class AuthenticateFragment extends DialogFragment {
 
     private String approvedToken;
 
+    private AuthUserViewModel authUserViewModel;
 
 
-    //*************************************************
-    // Constructor of an instance with the URL to load
-    //*************************************************
+    //***********************************************************
+    // Constructor of the fragment instance with the URL to load
+    //***********************************************************
     public static AuthenticateFragment newInstance(String url, String token) {
         AuthenticateFragment fragment = new AuthenticateFragment();
         Bundle args = new Bundle();
@@ -60,6 +62,7 @@ public class AuthenticateFragment extends DialogFragment {
         View view = inflater.inflate(R.layout.web_authenticate_fragment, container, false);
         WebView webView = view.findViewById(R.id.webview_auth);
         Button bt_continue = view.findViewById(R.id.bt_continue);
+        authUserViewModel = new ViewModelProvider(requireActivity()).get(AuthUserViewModel.class);
 
         if (getArguments() != null) {
             authUrl = getArguments().getString("AUTH_URL");
@@ -86,7 +89,7 @@ public class AuthenticateFragment extends DialogFragment {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 String url = request.getUrl().toString();
-                if(url.contains("/allow")){
+                if (url.contains("/allow")) {
                     bt_continue.setVisibility(View.VISIBLE);
                 }
                 return false;
@@ -97,7 +100,7 @@ public class AuthenticateFragment extends DialogFragment {
         //*****************************************************
         //Create a session when the continue button is clicked
         //*****************************************************
-        bt_continue.setOnClickListener(v->{
+        bt_continue.setOnClickListener(v -> {
             createSession();
         });
 
@@ -110,8 +113,7 @@ public class AuthenticateFragment extends DialogFragment {
     //********************************************************
     private void createSession() {
 
-        AuthUserRepository repo = new AuthUserRepository();
-        repo.createSession(approvedToken, new Callback<SessionUserResponse>() {
+        authUserViewModel.createSession(approvedToken, new Callback<SessionUserResponse>() {
             @Override
             public void onResponse(Call<SessionUserResponse> call, Response<SessionUserResponse> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
@@ -124,6 +126,7 @@ public class AuthenticateFragment extends DialogFragment {
                     Toast.makeText(getContext(), "Erreur lors de la création de la session", Toast.LENGTH_SHORT).show();
                 }
             }
+
             @Override
             public void onFailure(Call<SessionUserResponse> call, Throwable t) {
                 Toast.makeText(getContext(), "Erreur réseau", Toast.LENGTH_SHORT).show();

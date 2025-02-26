@@ -45,11 +45,10 @@ public interface MovieApiService {
 
 
     @GET("3/guest_session/{guest_session_id}/rated/movies")
-    Call<Result> getGuestRatedMovies(
+    Call<MoviesList> getGuestRatedMovies(
             @Path("guest_session_id") String guestSessionID,
             @Header("Authorization") String authToken,
             @Header("accept") String accept,
-            @Query("sort_by") String sortBy,
             @Query("language") String language,
             @Query("page") int page
     );

@@ -2,19 +2,22 @@ package com.example.movies_manager.ui.activities;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.movies_manager.R;
 import com.example.movies_manager.adapter.MoviesPagerAdapter;
 import com.example.movies_manager.databinding.ActivityMoviesListBinding;
 import com.example.movies_manager.model.User;
 import com.example.movies_manager.viewModel.MovieViewModel;
-import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class MoviesActivity extends BaseActivity<ActivityMoviesListBinding> {
 
@@ -24,6 +27,8 @@ public class MoviesActivity extends BaseActivity<ActivityMoviesListBinding> {
     private MoviesPagerAdapter moviesPagerAdapter;
     int userId;
     String userSessionId;
+    String guestSessionId;
+    String expireAt;
     private MovieViewModel movieViewModel;
     User user;
 
@@ -42,8 +47,19 @@ public class MoviesActivity extends BaseActivity<ActivityMoviesListBinding> {
         EdgeToEdge.enable(this);
         moviesPagerAdapter = new MoviesPagerAdapter(this);
         movieViewModel = new ViewModelProvider(this).get(MovieViewModel.class);
-        userId = getIntent().getIntExtra("userId",-1);;
-        userSessionId = getIntent().getStringExtra("userSessionId");
+
+        //*********************
+        //Get the intent data
+        //*********************
+        if (getIntent().getStringExtra("userSessionId") != null) {
+            userSessionId = getIntent().getStringExtra("userSessionId");
+        } else if (getIntent().getStringExtra("guestSessionId") != null) {
+            guestSessionId = getIntent().getStringExtra("guestSessionId");
+            expireAt = getIntent().getStringExtra("expiresAt");
+        }
+        userId = getIntent().getIntExtra("userId", -1);
+        ;
+
 
         binding.viewPager.setAdapter(moviesPagerAdapter);
         getPageTitle();
@@ -53,7 +69,7 @@ public class MoviesActivity extends BaseActivity<ActivityMoviesListBinding> {
         //*************************************************************
 
         movieViewModel.getUserById(userId).observe(this, user -> {
-            if(user != null){
+            if (user != null) {
                 this.user = user;
             }
         });
@@ -65,12 +81,26 @@ public class MoviesActivity extends BaseActivity<ActivityMoviesListBinding> {
         binding.bottomNavigationView.findViewById(R.id.profil).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                movieViewModel.deleteUserFromDatabase(userId).observe(MoviesActivity.this, value ->{
-                    if(value){
-                        finish();
-                    }
-                });
+                disconnectUser();
 
+            }
+        });
+
+        //*************************************************************
+        //Observe current date to disconnect guest if session expire
+        //*************************************************************
+        movieViewModel.getCurrentDate().observe(this, date -> {
+            if (date != null) {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z", Locale.ENGLISH);
+                try {
+                    Date parsedDate = sdf.parse(expireAt);
+                    if (date.after(parsedDate)) {
+                        Toast.makeText(getApplicationContext(), "Guest session expired", Toast.LENGTH_SHORT).show();
+                        disconnectUser();
+                    }
+                } catch (ParseException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -89,6 +119,16 @@ public class MoviesActivity extends BaseActivity<ActivityMoviesListBinding> {
                         tab.setText("Favoris");
                     }
                 }).attach();
+    }
+
+    public void disconnectUser() {
+        movieViewModel.deleteUserFromDatabase(userId).observe(MoviesActivity.this, value -> {
+            if (value) {
+                movieViewModel.allMovieNotFav();
+                finish();
+
+            }
+        });
     }
 
 }

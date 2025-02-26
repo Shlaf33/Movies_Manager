@@ -31,6 +31,7 @@ public class MovieRepository {
     //*****************
     private static final String API_TOKEN = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI2M2Q0ZTY2MjMzNzU4MzZjNjhkZmIxMmRmODNkNTg3ZSIsIm5iZiI6MTczOTUyMzY4Ni43NDg5OTk4LCJzdWIiOiI2N2FmMDY2NmExOGViZjJhYzU4ZTVmNzIiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.mdHxMj7gwa3s3z-tAKyFNFIhEGC6Isob1Zyrg3Z7DX8";
     private static final String ACCEPT_HEADER = "application/json";
+
     private MovieApiService movieApiService;
     private Realm realm;
     private RealmResults<Movie> favorites;
@@ -44,6 +45,7 @@ public class MovieRepository {
         movieApiService = RetrofitService.getMovieApiInstance();
         realm = Realm.getDefaultInstance();
     }
+
 
 
     //******************************************
@@ -331,6 +333,23 @@ public class MovieRepository {
         });
     }
 
+    //***********************************************************
+    //Turn all movies into no favorite for guest user connexion
+    //***********************************************************
+    public void allMovieNotFav(){
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                List<Movie> moviesList = realm.where(Movie.class)
+                        .findAll();
+                for(Movie movie: moviesList){
+                    movie.setFavorite(false);
+                }
+                realm.insertOrUpdate(moviesList);
+            }
+        });
+    }
+
 
     //********************************************
     //Post a favorite movie onto the user account
@@ -388,6 +407,9 @@ public class MovieRepository {
             }
         });
     }
+
+
+
 
     //**********************
     //Close realm instance

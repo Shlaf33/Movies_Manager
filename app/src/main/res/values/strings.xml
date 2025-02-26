@@ -17,6 +17,7 @@
     <string name="userNeeded">You need to create a user or log as guest</string>
     <string name="guestLogin">Login as guest</string>
     <string name="themoviedb">Powered by themoviedb.org</string>
+    <string name="guest">Guest</string>
 
 
 

@@ -1,17 +1,12 @@
 package com.example.movies_manager.adapter;
 
 
-
-import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
-import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,7 +15,6 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.Target;
 import com.example.movies_manager.R;
 import com.example.movies_manager.model.Movie;
-import com.example.movies_manager.ui.fragments.MovieFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,13 +61,13 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
 
         Movie movie = moviesList.get(position);
         holder.bind(movie);
-        int movieNumber = position+1;
-        holder.tv_movie_number.setText(""+movieNumber);
+        int movieNumber = position + 1;
+        holder.tv_movie_number.setText("" + movieNumber);
 
         onDeleteClickMovieListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(onDeleteMovieListener!=null){
+                if (onDeleteMovieListener != null) {
                     onDeleteMovieListener.onDeleteClick(movie);
                 }
             }
@@ -82,7 +76,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
         holder.ib_favorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(onMovieListener!=null){
+                if (onMovieListener != null) {
                     onMovieListener.onAddFavClick(movie);
                 }
 
@@ -144,10 +138,10 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
 
             }
 
-            if(movie.isFavorite()){
+            if (movie.isFavorite()) {
                 ib_favorite.setImageResource(R.drawable.baseline_favorite_24);
             }
-            if(!movie.isFavorite()){
+            if (!movie.isFavorite()) {
                 ib_favorite.setImageResource(R.drawable.baseline_favorite_border_24);
             }
             if (movie.getTitle() == null || Objects.equals(movie.getTitle(), "")) {
@@ -190,11 +184,11 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     //Callbacks for adding favorite movie and deleting it from database
     //******************************************************************
 
-    public interface OnMovieListener{
+    public interface OnMovieListener {
         void onAddFavClick(Movie movie);
     }
 
-    public interface OnDeleteMovieListener{
+    public interface OnDeleteMovieListener {
 
         void onDeleteClick(Movie movie);
     }
@@ -205,7 +199,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     //******************************************************************
     public void removeMovie(Movie movie) {
         int position = moviesList.indexOf(movie);
-        if(position != -1){
+        if (position != -1) {
             moviesList.remove(position);
             notifyItemRemoved(position);
         }
@@ -214,10 +208,10 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     //*********************************************************************************************
     //Get movie ID from fragment and modify its favorite status in adapter to change favorite icon
     //*********************************************************************************************
-    public void changeFavoriteIcon(int movieId, boolean isFavorite){
-        for(int i = 0; i < moviesList.size(); i++){
+    public void changeFavoriteIcon(int movieId, boolean isFavorite) {
+        for (int i = 0; i < moviesList.size(); i++) {
             Movie movie = moviesList.get(i);
-            if(movie.getId_title() == movieId){
+            if (movie.getId_title() == movieId) {
                 movie.setFavorite(isFavorite);
                 notifyItemChanged(i);
             }

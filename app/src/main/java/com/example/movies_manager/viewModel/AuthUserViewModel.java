@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.movies_manager.model.User;
 import com.example.movies_manager.pojo.authenticate.AccountDetail;
+import com.example.movies_manager.pojo.authenticate.SessionGuestUserResponse;
 import com.example.movies_manager.pojo.authenticate.SessionUserResponse;
 import com.example.movies_manager.repositories.AuthUserRepository;
 import com.example.movies_manager.service.TokenCallback;
@@ -54,6 +55,15 @@ public class AuthUserViewModel extends ViewModel {
 
     public void createSession(String requestToken, Callback<SessionUserResponse> callback){
         authUserRepository.createSession(requestToken,callback);
+    }
+
+
+    //************************
+    //Create a guest session
+    //************************
+
+    public void createGuestSession(Callback<SessionGuestUserResponse> callback){
+        authUserRepository.createGuestSession(callback);
     }
 
     //*********************************************************

@@ -8,10 +8,11 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.movies_manager.model.Movie;
 import com.example.movies_manager.model.User;
-import com.example.movies_manager.pojo.moviesList.FavoriteRequest;
 import com.example.movies_manager.pojo.moviesList.Result;
 import com.example.movies_manager.repositories.MovieRepository;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class MovieViewModel extends ViewModel {
@@ -25,14 +26,10 @@ public class MovieViewModel extends ViewModel {
     private LiveData<List<Movie>> moviesFromDatabase;
     private final LiveData<List<Movie>> favoriteMovies;
 
-    private final MutableLiveData<List<Movie>> moviesLiveData = new MutableLiveData<>();
-
     private final MutableLiveData<Boolean> dataLoaded = new MutableLiveData<>();
     private final MutableLiveData<Boolean> userDeleted = new MutableLiveData<>();
 
-    private LiveData<User>  userLiveData;
-
-
+    private LiveData<User> userLiveData;
 
 
     //*****************
@@ -45,19 +42,17 @@ public class MovieViewModel extends ViewModel {
     }
 
 
-
-
     //*************************************************
     // Méthode pour récupérer les films depuis l'API
     //*************************************************
 
     public void getPopularMovies(int totalPages) {
 
-        for(int page = 1; page<=totalPages; page++){
+        for (int page = 1; page <= totalPages; page++) {
             int finalPage = page;
-            movieRepository.getPopularMovies("fr-FR",finalPage, () -> {
+            movieRepository.getPopularMovies("fr-FR", finalPage, () -> {
                 Log.v("Loaded Data", "true");
-                if(finalPage ==totalPages){
+                if (finalPage == totalPages) {
                     dataLoaded.postValue(true);
                 }
             });
@@ -66,7 +61,7 @@ public class MovieViewModel extends ViewModel {
 
     }
 
-    public LiveData<Boolean> getDataLoaded(){
+    public LiveData<Boolean> getDataLoaded() {
         return dataLoaded;
     }
 
@@ -74,7 +69,7 @@ public class MovieViewModel extends ViewModel {
     //Check if there are movies left in database
     //*********************************************
 
-    public Boolean isThereMoviesLeft(){
+    public Boolean isThereMoviesLeft() {
         return movieRepository.isThereMoviesLeft();
     }
 
@@ -83,13 +78,9 @@ public class MovieViewModel extends ViewModel {
     //Return the first 10 movies from database
     //********************************************
 
-    public LiveData<List<Movie>> getTenMoviesFromDatabase(final int offset, final int limit){
+    public LiveData<List<Movie>> getTenMoviesFromDatabase(final int offset, final int limit) {
         moviesFromDatabase = movieRepository.getTenMoviesFromDatabase(offset, limit);
         return moviesFromDatabase;
-    }
-
-    public MutableLiveData<List<Movie>> getLiveData(){
-        return moviesLiveData;
     }
 
 
@@ -97,17 +88,16 @@ public class MovieViewModel extends ViewModel {
     //Return either a movie is favorite or not for updating UI ans display a Toast
     //******************************************************************************
 
-    public boolean isMovieFavorite(Movie movie){
+    public boolean isMovieFavorite(Movie movie) {
         return movieRepository.isMovieFavorite(movie);
     }
-
 
 
     //********************************
     //Delete a movie from database
     //********************************
 
-    public void deleteMovieFromDatabase(Movie movie){
+    public void deleteMovieFromDatabase(Movie movie) {
         movieRepository.deleteMovie(movie);
     }
 
@@ -119,7 +109,6 @@ public class MovieViewModel extends ViewModel {
     public LiveData<List<Movie>> getFavoriteMovies() {
         return favoriteMovies;
     }
-
 
 
     //**********************************
@@ -135,12 +124,12 @@ public class MovieViewModel extends ViewModel {
     //Return the user that has the same ID
     //**************************************
 
-    public LiveData<User> getUserById(int userId){
+    public LiveData<User> getUserById(int userId) {
         userLiveData = movieRepository.getUserById(userId);
         return movieRepository.getUserById(userId);
     }
 
-    public LiveData<User> getUserLiveData(){
+    public LiveData<User> getUserLiveData() {
         return userLiveData;
     }
 
@@ -148,8 +137,8 @@ public class MovieViewModel extends ViewModel {
     //Post a favorite movie onto the user account
     //********************************************
 
-    public void postFavoriteMovie(Movie movie, int accountId, String sessionId, boolean isFav){
-        movieRepository.postFavoriteMovie(movie, accountId,sessionId, isFav);
+    public void postFavoriteMovie(Movie movie, int accountId, String sessionId, boolean isFav) {
+        movieRepository.postFavoriteMovie(movie, accountId, sessionId, isFav);
     }
 
     //***********************************************************
@@ -157,7 +146,7 @@ public class MovieViewModel extends ViewModel {
     //***********************************************************
 
     public LiveData<List<Result>> getUserFavoriteMovie(int accountId, String language, int page, String sessionId) {
-        return movieRepository.getUserFavoriteMovie(accountId, language, page,sessionId);
+        return movieRepository.getUserFavoriteMovie(accountId, language, page, sessionId);
     }
 
 
@@ -165,19 +154,36 @@ public class MovieViewModel extends ViewModel {
     //Turn user favorite movie into database
     //***************************************
 
-    public void turnUserFavMovieInDatabase(List<Result> resultList){
+    public void turnUserFavMovieInDatabase(List<Result> resultList) {
         movieRepository.turnUserFavMovieInDatabase(resultList);
+    }
+
+    //***********************************************************
+    //Turn all movies into no favorite for guest user connexion
+    //***********************************************************
+    public void allMovieNotFav() {
+        movieRepository.allMovieNotFav();
     }
 
     //***************************
     //Delete user from database
     //***************************
-    public LiveData<Boolean> deleteUserFromDatabase(int userId){
+    public LiveData<Boolean> deleteUserFromDatabase(int userId) {
         movieRepository.deleteUserFromDatabase(userId, () ->
-               userDeleted.postValue(true) );
+                userDeleted.postValue(true));
         return userDeleted;
     }
 
+    //*******************************************
+    //Get current date to disconnect guest user
+    //*******************************************
+    public LiveData<Date> getCurrentDate() {
+        MutableLiveData<Date> currentDate = new MutableLiveData<>();
+        Date date = Calendar.getInstance().getTime();
+        ;
+        currentDate.postValue(date);
+        return currentDate;
+    }
 
 
     //**********************

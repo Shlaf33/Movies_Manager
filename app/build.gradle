@@ -43,7 +43,7 @@ dependencies {
     //Realm Database
     implementation libs.realm.gradle.plugin.v10101
     implementation libs.core.ktx
-    //implementation libs.android.adapters.v310
+    testImplementation libs.ext.junit
 
     //OkHTTP
     implementation libs.okhttp
@@ -73,6 +73,7 @@ dependencies {
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
+
 }
 realm {
     syncEnabled = true

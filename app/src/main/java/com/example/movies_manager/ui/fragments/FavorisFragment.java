@@ -26,6 +26,8 @@ public class FavorisFragment extends Fragment {
     int accountId;
     String sessionId;
 
+    String guestSessionId;
+
     public static FavorisFragment newInstance() {
         FavorisFragment favorisFragment = new FavorisFragment();
         return favorisFragment;
@@ -58,17 +60,21 @@ public class FavorisFragment extends Fragment {
 
         movieViewModel.getUserLiveData().observe(getViewLifecycleOwner(), user -> {
             if (user != null) {
-                Log.d("UserData", user.getSessionId());
-                sessionId = user.getSessionId();
-                accountId = user.getId();
-                movieViewModel.getUserFavoriteMovie(accountId, "fr-FR", 1, sessionId).observe(getViewLifecycleOwner(), resultList -> {
-                    if (resultList != null && !resultList.isEmpty()) {
-                        Log.d("ResultList", "not null" + resultList);
-                        movieViewModel.turnUserFavMovieInDatabase(resultList);
-                    } else {
-                        Log.d("ResultList", "null" + sessionId + accountId);
-                    }
-                });
+                if(user.getSessionId()!=null){
+                    Log.d("UserData", user.getSessionId());
+                    sessionId = user.getSessionId();
+                    movieViewModel.getUserFavoriteMovie(accountId, "fr-FR", 1, sessionId).observe(getViewLifecycleOwner(), resultList -> {
+                        if (resultList != null && !resultList.isEmpty()) {
+                            Log.d("ResultList", "not null" + resultList);
+                            movieViewModel.turnUserFavMovieInDatabase(resultList);
+                        } else {
+                            Log.d("ResultList", "null" + sessionId + accountId);
+                        }
+                    });
+                }
+                else if(user.getGuestSessionId()!=null){
+                    guestSessionId = user.getGuestSessionId();
+                }
             }
         });
 

@@ -34,6 +34,7 @@ public class MovieFragment extends Fragment implements MoviesAdapter.OnMovieList
 
     int accountId;
     String sessionId;
+    String guestSessionId;
     int offset = 0;
     int limit = 10;
 
@@ -79,24 +80,33 @@ public class MovieFragment extends Fragment implements MoviesAdapter.OnMovieList
         movieViewModel = new ViewModelProvider(requireActivity()).get(MovieViewModel.class);
         fabAddMovies = view.findViewById(R.id.fab_movies);
 
-        //*******************************************
-        //Retrieving user account data from activity
-        //*******************************************
+        //***************************************************
+        //Retrieving user or guest credentials from activity
+        //***************************************************
         movieViewModel.getUserLiveData().observe(getViewLifecycleOwner(), user ->{
             if(user!=null){
-                Log.d("UserData", user.getSessionId());
-                sessionId = user.getSessionId();
                 accountId = user.getId();
-                movieViewModel.getUserFavoriteMovie(accountId, "fr-FR", 1, sessionId).observe(getViewLifecycleOwner(), resultList -> {
-                    if (resultList != null && !resultList.isEmpty()) {
-                        Log.d("ResultList", "not null" + resultList);
-                        movieViewModel.turnUserFavMovieInDatabase(resultList);
-                    } else {
-                        Log.d("ResultList", "null" + sessionId + accountId);
-                    }
-                });
+                if(user.getSessionId()!=null){
+                    Log.d("UserData", user.getSessionId());
+                    sessionId = user.getSessionId();
+                    movieViewModel.getUserFavoriteMovie(accountId, "fr-FR", 1, sessionId).observe(getViewLifecycleOwner(), resultList -> {
+                        if (resultList != null && !resultList.isEmpty()) {
+                            Log.d("ResultList", "not null" + resultList);
+                            movieViewModel.turnUserFavMovieInDatabase(resultList);
+                        } else {
+                            Log.d("ResultList", "null" + sessionId + accountId);
+                        }
+                    });
+
+                }
+                else if(user.getGuestSessionId()!=null){
+                    guestSessionId = user.getGuestSessionId();
+
+                }
+
             }
         });
+
 
         //**************************************************************************************************************
         //Load movies in adapter if there are any in database otherwise call web request to fetch database with movies
@@ -106,7 +116,7 @@ public class MovieFragment extends Fragment implements MoviesAdapter.OnMovieList
             observeMovieData(offset, limit);
         }
         else{
-           loadMoviesFromWeb();
+            loadMoviesFromWeb();
         }
 
         //*********************************************************************
@@ -123,6 +133,8 @@ public class MovieFragment extends Fragment implements MoviesAdapter.OnMovieList
                 loadMoviesFromWeb();
             }
         });
+
+
 
         //**************************************************
         //Load the next ten movies from database in adapter
@@ -196,4 +208,5 @@ public class MovieFragment extends Fragment implements MoviesAdapter.OnMovieList
         movieViewModel.getPopularMovies(3);
         Toast.makeText(getContext(), "Loading movies from themoviedb.org", Toast.LENGTH_SHORT).show();
     }
+
 }

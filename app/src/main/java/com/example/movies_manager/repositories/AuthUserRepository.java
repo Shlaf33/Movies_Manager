@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.movies_manager.model.User;
 import com.example.movies_manager.pojo.authenticate.AccountDetail;
+import com.example.movies_manager.pojo.authenticate.SessionGuestUserResponse;
 import com.example.movies_manager.pojo.authenticate.SessionRequest;
 import com.example.movies_manager.pojo.authenticate.SessionUserResponse;
 import com.example.movies_manager.pojo.authenticate.Token;
@@ -75,6 +76,14 @@ public class AuthUserRepository {
     public void createSession(String requestToken, Callback<SessionUserResponse> callback) {
         SessionRequest request = new SessionRequest(requestToken);
         userApiService.createSession(API_TOKEN, ACCEPT_HEADER, ACCEPT_HEADER,request).enqueue(callback);
+    }
+
+    //************************
+    //Create a guest session
+    //************************
+
+    public void createGuestSession(Callback<SessionGuestUserResponse> callback){
+        userApiService.createGuestSession(API_TOKEN, ACCEPT_HEADER).enqueue(callback);
     }
 
     //*************************************

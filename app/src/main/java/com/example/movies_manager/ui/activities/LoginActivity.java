@@ -2,19 +2,18 @@ package com.example.movies_manager.ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.movies_manager.R;
 import com.example.movies_manager.databinding.ActivityLoginBinding;
 import com.example.movies_manager.model.User;
 import com.example.movies_manager.pojo.authenticate.AccountDetail;
+import com.example.movies_manager.pojo.authenticate.SessionGuestUserResponse;
 import com.example.movies_manager.service.TokenCallback;
 import com.example.movies_manager.ui.fragments.AuthenticateFragment;
 import com.example.movies_manager.viewModel.AuthUserViewModel;
@@ -50,6 +49,10 @@ public class LoginActivity extends BaseActivity<ActivityLoginBinding> {
 
         authUserViewModel = new ViewModelProvider(this).get(AuthUserViewModel.class);
 
+
+        //***************************************************
+        //change the ui if there is a user connected or not
+        //***************************************************
         authUserViewModel.getUser().observe(this, user -> {
             if (user == null) {
                 binding.tvUser.setText(R.string.userNeeded);
@@ -62,7 +65,12 @@ public class LoginActivity extends BaseActivity<ActivityLoginBinding> {
             } else {
                 binding.tvUser.setText(R.string.User);
                 binding.tvSelectUser.setVisibility(View.VISIBLE);
-                binding.tvSelectUser.setText(user.getUsername());
+                if (user.getUsername() != null) {
+                    binding.tvSelectUser.setText(user.getUsername());
+                } else {
+                    binding.tvSelectUser.setText(R.string.guest);
+                }
+
                 binding.btLogin.setVisibility(View.VISIBLE);
                 binding.btCreateUser.setVisibility(View.INVISIBLE);
                 binding.tvLoginGuest.setVisibility(View.INVISIBLE);
@@ -72,13 +80,16 @@ public class LoginActivity extends BaseActivity<ActivityLoginBinding> {
         });
 
 
+        //************************************************************************************
+        //Launch the webview fragment when clicked on "Connexion" button and get credentials
+        //************************************************************************************
         binding.btCreateUser.setOnClickListener(v -> {
 
             authUserViewModel.fetchToken(new TokenCallback() {
                 @Override
                 public void onTokenReceived(String token) {
                     String authUrl = "https://www.themoviedb.org/authenticate/";
-                    // Affichez votre DialogFragment avec l'URL d'authentification
+
                     AuthenticateFragment dialogFragment = AuthenticateFragment.newInstance(authUrl, token);
                     dialogFragment.setAuthListener(new AuthenticateFragment.AuthListener() {
                         @Override
@@ -95,14 +106,14 @@ public class LoginActivity extends BaseActivity<ActivityLoginBinding> {
                                         newUser.setUsername(userName);
                                         authUserViewModel.createUser(newUser);
                                     } else {
-                                        Toast.makeText(getApplicationContext(), "Erreur lors de la récupération des details du compte utilisateur", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getApplicationContext(), "Error while getting user credentials", Toast.LENGTH_SHORT).show();
                                     }
 
                                 }
 
                                 @Override
                                 public void onFailure(Call<AccountDetail> call, Throwable t) {
-                                    Toast.makeText(getApplicationContext(), "Erreur réseau", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getApplicationContext(), "Network error", Toast.LENGTH_SHORT).show();
                                 }
                             });
                         }
@@ -112,16 +123,54 @@ public class LoginActivity extends BaseActivity<ActivityLoginBinding> {
 
                 @Override
                 public void onError(Throwable t) {
-                    Toast.makeText(LoginActivity.this, "Erreur lors de la récupération du token", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "Getting token error", Toast.LENGTH_SHORT).show();
                 }
             });
 
         });
 
+
+        //*************************************************
+        //Start the movie activity when user is registered
+        //*************************************************
         binding.btLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startMovieActivity();
+            }
+        });
+
+
+        //********************************************************
+        //Create guest session and start activity when registered
+        //********************************************************
+        binding.tvLoginGuest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                authUserViewModel.createGuestSession(new Callback<SessionGuestUserResponse>() {
+                    @Override
+                    public void onResponse(Call<SessionGuestUserResponse> call, Response<SessionGuestUserResponse> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            User guestUser = new User();
+                            String guestSessionId = response.body().getGuest_session_id();
+                            String expireAt = response.body().getExpires_at();
+                            guestUser.setGuestSessionId(guestSessionId);
+                            guestUser.setExpireAt(expireAt);
+                            Log.d("GuestExpire", expireAt);
+                            authUserViewModel.createUser(guestUser);
+                            user = guestUser;
+                            Toast.makeText(getApplicationContext(), "Logged as guest", Toast.LENGTH_SHORT).show();
+                            startMovieActivity();
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Error while getting Guestuser credentials", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<SessionGuestUserResponse> call, Throwable t) {
+                        Log.e("GuestUser", "Network error");
+                    }
+                });
             }
         });
 
@@ -130,7 +179,13 @@ public class LoginActivity extends BaseActivity<ActivityLoginBinding> {
     public void startMovieActivity() {
         Intent intent = new Intent(this, MoviesActivity.class);
         intent.putExtra("userId", user.getId());
-        intent.putExtra("userSessionId", user.getSessionId());
+        if (user.getSessionId() != null) {
+            intent.putExtra("userSessionId", user.getSessionId());
+        } else {
+            intent.putExtra("guestSessionId", user.getGuestSessionId());
+            intent.putExtra("expiresAt", user.getExpireAt());
+        }
+
         startActivity(intent);
     }
 
