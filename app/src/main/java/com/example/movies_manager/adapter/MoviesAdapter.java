@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.Target;
 import com.example.movies_manager.R;
+import com.example.movies_manager.databinding.FragmentMoviesBinding;
 import com.example.movies_manager.model.Movie;
 
 import java.util.ArrayList;
@@ -51,9 +52,8 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_movies, parent, false);
-        return new ViewHolder(view);
+        FragmentMoviesBinding binding = FragmentMoviesBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        return new ViewHolder(binding);
     }
 
     @Override
@@ -110,19 +110,19 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
         //***************************
         //ViewHolder initialisation
         //***************************
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
+        public ViewHolder(@NonNull FragmentMoviesBinding binding) {
+            super(binding.getRoot());
 
-            iv_movie_image = itemView.findViewById(R.id.iv_movie_image);
-            tv_movie_title = itemView.findViewById(R.id.tv_movie_title);
-            tv_release_date = itemView.findViewById(R.id.tv_release_date);
-            tv_popularity = itemView.findViewById(R.id.tv_popularity);
-            tv_overview_text = itemView.findViewById(R.id.tv_overview_text);
-            tv_movie_number = itemView.findViewById(R.id.tv_movie_number);
-            ib_favorite = itemView.findViewById(R.id.ib_favorite);
-            ib_comment = itemView.findViewById(R.id.ib_comment);
-            ib_share = itemView.findViewById(R.id.ib_share);
-            ib_options = itemView.findViewById(R.id.ib_options);
+            iv_movie_image = binding.ivMovieImage;
+            tv_movie_title = binding.tvMovieTitle;
+            tv_release_date = binding.tvReleaseDate;
+            tv_popularity = binding.tvPopularity;
+            tv_overview_text = binding.tvOverviewText;
+            tv_movie_number = binding.tvMovieNumber;
+            ib_favorite = binding.ibFavorite;
+            ib_comment = binding.ibComment;
+            ib_share = binding.ibShare;
+            ib_options = binding.ibOptions;
         }
 
         public void bind(Movie movie) {

@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.android.application)
     id 'org.jetbrains.kotlin.android'
     id 'org.jetbrains.kotlin.kapt'
+    id 'dagger.hilt.android.plugin'
 }
 apply plugin: "realm-android"
 
@@ -73,6 +74,10 @@ dependencies {
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
+
+    //Hilt
+    implementation libs.hilt.android
+    kapt libs.hilt.compiler
 
 }
 realm {

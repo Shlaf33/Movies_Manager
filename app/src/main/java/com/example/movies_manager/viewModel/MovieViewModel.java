@@ -15,6 +15,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.lifecycle.HiltViewModel;
+
+@HiltViewModel
 public class MovieViewModel extends ViewModel {
 
     //*****************
@@ -32,13 +37,14 @@ public class MovieViewModel extends ViewModel {
     private LiveData<User> userLiveData;
 
 
-    //*****************
-    //Constructor
-    //*****************
+    //*********************************************
+    //Constructor with injected MovieRepository
+    //*********************************************
 
-    public MovieViewModel() {
-        movieRepository = new MovieRepository();
-        favoriteMovies = movieRepository.getFavoriteMovies();
+    @Inject
+    public MovieViewModel(MovieRepository movieRepository) {
+        this.movieRepository =  movieRepository;
+        favoriteMovies = this.movieRepository.getFavoriteMovies();
     }
 
 
@@ -180,7 +186,6 @@ public class MovieViewModel extends ViewModel {
     public LiveData<Date> getCurrentDate() {
         MutableLiveData<Date> currentDate = new MutableLiveData<>();
         Date date = Calendar.getInstance().getTime();
-        ;
         currentDate.postValue(date);
         return currentDate;
     }

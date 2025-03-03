@@ -12,13 +12,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.movies_manager.R;
 import com.example.movies_manager.adapter.MoviesAdapter;
+import com.example.movies_manager.databinding.FragmentMoviesListBinding;
 import com.example.movies_manager.model.Movie;
 import com.example.movies_manager.viewModel.MovieViewModel;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MovieFragment extends Fragment implements MoviesAdapter.OnMovieListener, MoviesAdapter.OnDeleteMovieListener {
 
@@ -27,10 +25,9 @@ public class MovieFragment extends Fragment implements MoviesAdapter.OnMovieList
     //Variables
     //*******************
 
-    private RecyclerView mRecyclerView;
     private MovieViewModel movieViewModel;
     private MoviesAdapter adapter;
-    private FloatingActionButton fabAddMovies;
+    private FragmentMoviesListBinding binding;
 
     int accountId;
     String sessionId;
@@ -61,32 +58,30 @@ public class MovieFragment extends Fragment implements MoviesAdapter.OnMovieList
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_movies_list, container, false);
-        mRecyclerView = view.findViewById(R.id.rv_movies);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new MoviesAdapter(this, this);
-        mRecyclerView.setAdapter(adapter);
-        return view;
+        binding = FragmentMoviesListBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        //************************************
-        //ViewModel and button initialisation
-        //*************************************
-
+        //***************************************************
+        //Adapter, viewmodel and recyclerview initialisation
+        //***************************************************
+        adapter = new MoviesAdapter(this, this);
+        binding.rvMovies.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.rvMovies.setAdapter(adapter);
         movieViewModel = new ViewModelProvider(requireActivity()).get(MovieViewModel.class);
-        fabAddMovies = view.findViewById(R.id.fab_movies);
+
 
         //***************************************************
         //Retrieving user or guest credentials from activity
         //***************************************************
-        movieViewModel.getUserLiveData().observe(getViewLifecycleOwner(), user ->{
-            if(user!=null){
+        movieViewModel.getUserLiveData().observe(getViewLifecycleOwner(), user -> {
+            if (user != null) {
                 accountId = user.getId();
-                if(user.getSessionId()!=null){
+                if (user.getSessionId() != null) {
                     Log.d("UserData", user.getSessionId());
                     sessionId = user.getSessionId();
                     movieViewModel.getUserFavoriteMovie(accountId, "fr-FR", 1, sessionId).observe(getViewLifecycleOwner(), resultList -> {
@@ -98,8 +93,7 @@ public class MovieFragment extends Fragment implements MoviesAdapter.OnMovieList
                         }
                     });
 
-                }
-                else if(user.getGuestSessionId()!=null){
+                } else if (user.getGuestSessionId() != null) {
                     guestSessionId = user.getGuestSessionId();
 
                 }
@@ -112,10 +106,9 @@ public class MovieFragment extends Fragment implements MoviesAdapter.OnMovieList
         //Load movies in adapter if there are any in database otherwise call web request to fetch database with movies
         //**************************************************************************************************************
 
-        if(movieViewModel.isThereMoviesLeft()){
+        if (movieViewModel.isThereMoviesLeft()) {
             observeMovieData(offset, limit);
-        }
-        else{
+        } else {
             loadMoviesFromWeb();
         }
 
@@ -128,19 +121,17 @@ public class MovieFragment extends Fragment implements MoviesAdapter.OnMovieList
             if (loaded) {
                 observeMovieData(offset, limit);
 
-            }
-            else{
+            } else {
                 loadMoviesFromWeb();
             }
         });
-
 
 
         //**************************************************
         //Load the next ten movies from database in adapter
         //**************************************************
 
-        fabAddMovies.setOnClickListener(new View.OnClickListener() {
+        binding.fabMovies.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 offset += 10;
@@ -150,7 +141,6 @@ public class MovieFragment extends Fragment implements MoviesAdapter.OnMovieList
         });
 
     }
-
 
 
     //******************************************************************************************************************************************
@@ -182,7 +172,7 @@ public class MovieFragment extends Fragment implements MoviesAdapter.OnMovieList
     public void onDeleteClick(Movie movie) {
         movieViewModel.deleteMovieFromDatabase(movie);
         adapter.removeMovie(movie);
-        if (adapter.getItemCount() == 0 ) {
+        if (adapter.getItemCount() == 0) {
             Toast.makeText(getContext(), "Loading ten more movies", Toast.LENGTH_SHORT).show();
             observeMovieData(0, 10);
         }
@@ -195,7 +185,7 @@ public class MovieFragment extends Fragment implements MoviesAdapter.OnMovieList
     //**********************************************************************************************************
 
     public void observeMovieData(int offset, int limit) {
-        movieViewModel.getTenMoviesFromDatabase(offset,limit).observe(getViewLifecycleOwner(), movies -> {
+        movieViewModel.getTenMoviesFromDatabase(offset, limit).observe(getViewLifecycleOwner(), movies -> {
             if (movies != null && !movies.isEmpty()) {
                 adapter.updateMovies(movies);
             } else {
@@ -204,7 +194,7 @@ public class MovieFragment extends Fragment implements MoviesAdapter.OnMovieList
         });
     }
 
-    public void loadMoviesFromWeb(){
+    public void loadMoviesFromWeb() {
         movieViewModel.getPopularMovies(3);
         Toast.makeText(getContext(), "Loading movies from themoviedb.org", Toast.LENGTH_SHORT).show();
     }

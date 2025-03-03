@@ -19,6 +19,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
+
 public class MoviesActivity extends BaseActivity<ActivityMoviesListBinding> {
 
     //***********
@@ -29,7 +35,8 @@ public class MoviesActivity extends BaseActivity<ActivityMoviesListBinding> {
     String userSessionId;
     String guestSessionId;
     String expireAt;
-    private MovieViewModel movieViewModel;
+
+    MovieViewModel movieViewModel;
     User user;
 
 
@@ -89,17 +96,20 @@ public class MoviesActivity extends BaseActivity<ActivityMoviesListBinding> {
         //*************************************************************
         //Observe current date to disconnect guest if session expire
         //*************************************************************
+
         movieViewModel.getCurrentDate().observe(this, date -> {
             if (date != null) {
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z", Locale.ENGLISH);
-                try {
-                    Date parsedDate = sdf.parse(expireAt);
-                    if (date.after(parsedDate)) {
-                        Toast.makeText(getApplicationContext(), "Guest session expired", Toast.LENGTH_SHORT).show();
-                        disconnectUser();
+                if (expireAt != null) {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z", Locale.ENGLISH);
+                    try {
+                        Date parsedDate = sdf.parse(expireAt);
+                        if (date.after(parsedDate)) {
+                            Toast.makeText(getApplicationContext(), "Guest session expired", Toast.LENGTH_SHORT).show();
+                            disconnectUser();
+                        }
+                    } catch (ParseException e) {
+                        throw new RuntimeException(e);
                     }
-                } catch (ParseException e) {
-                    throw new RuntimeException(e);
                 }
             }
         });

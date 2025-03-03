@@ -6,6 +6,7 @@ buildscript {
     }
     dependencies {
         classpath libs.realm.gradle.plugin
+        classpath libs.hilt.android.gradle.plugin
     }
 }
 plugins {

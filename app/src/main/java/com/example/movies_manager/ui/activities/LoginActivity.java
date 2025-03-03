@@ -18,9 +18,12 @@ import com.example.movies_manager.service.TokenCallback;
 import com.example.movies_manager.ui.fragments.AuthenticateFragment;
 import com.example.movies_manager.viewModel.AuthUserViewModel;
 
+import dagger.hilt.android.AndroidEntryPoint;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+@AndroidEntryPoint
 
 public class LoginActivity extends BaseActivity<ActivityLoginBinding> {
 

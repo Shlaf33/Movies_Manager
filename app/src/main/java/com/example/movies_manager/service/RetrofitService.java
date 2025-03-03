@@ -3,6 +3,7 @@ package com.example.movies_manager.service;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+
 public class RetrofitService {
 
     private static final String BASE_URL = "https://api.themoviedb.org/";
@@ -18,7 +19,7 @@ public class RetrofitService {
         return retrofit.create(MovieApiService.class);
     }
 
-    public static UserApiService getUserApiInstance(){
+    public static UserApiService getUserApiInstance() {
         if (retrofit == null) {
             retrofit = new Retrofit.Builder()
                     .baseUrl(BASE_URL)

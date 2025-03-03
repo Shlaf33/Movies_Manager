@@ -17,6 +17,13 @@ import com.example.movies_manager.service.RetrofitService;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import dagger.Module;
+import dagger.Provides;
+import dagger.hilt.InstallIn;
+import dagger.hilt.components.SingletonComponent;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
@@ -24,6 +31,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+@Module
+@InstallIn(SingletonComponent.class)
 public class MovieRepository {
 
     //*****************
@@ -38,14 +47,28 @@ public class MovieRepository {
     private RealmResults<Movie> movies;
 
 
-    //*****************
-    //Constructor
-    //*****************
-    public MovieRepository() {
-        movieApiService = RetrofitService.getMovieApiInstance();
-        realm = Realm.getDefaultInstance();
+    //****************************************
+    //Constructors with injected Realm module
+    //****************************************
+
+    @Provides
+    @Singleton
+    public MovieRepository provideMovieRepository(Realm realm) {
+
+        return new MovieRepository(realm);
     }
 
+    public MovieRepository() {
+
+    }
+
+
+    @Inject
+    public MovieRepository(Realm realm) {
+        movieApiService = RetrofitService.getMovieApiInstance();
+
+        this.realm = realm;
+    }
 
 
     //******************************************
@@ -141,14 +164,12 @@ public class MovieRepository {
     //************************************************************************************
     //Return either a movie is favorite or not for updating the UI and displaying a Toast
     //************************************************************************************
-    public Boolean isMovieFavorite(Movie movie){
+    public Boolean isMovieFavorite(Movie movie) {
         Movie manageMovie = realm.where(Movie.class)
                 .equalTo("id_title", movie.getId_title())
                 .findFirst();
         return manageMovie != null && manageMovie.isFavorite();
     }
-
-
 
 
     //*******************************************
@@ -163,8 +184,8 @@ public class MovieRepository {
                         .findAll(); // Requête synchrone dans la transaction
 
                 List<Movie> movies = new ArrayList<>();
-                if(results.size() > offset){
-                    int end = Math.min(results.size() , offset+limit);
+                if (results.size() > offset) {
+                    int end = Math.min(results.size(), offset + limit);
                     movies = realm.copyFromRealm(results.subList(offset, end));
                 }
                 moviesLiveData.postValue(movies);
@@ -177,7 +198,7 @@ public class MovieRepository {
     //******************************
     //Delete a movie from database
     //******************************
-    public void deleteMovie(Movie movie){
+    public void deleteMovie(Movie movie) {
 
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
@@ -185,7 +206,7 @@ public class MovieRepository {
                 Movie managedMovie = realm.where(Movie.class)
                         .equalTo("id_title", movie.getId_title())
                         .findFirst();
-                if(managedMovie!=null){
+                if (managedMovie != null) {
                     managedMovie.deleteFromRealm();
                 }
             }
@@ -250,17 +271,17 @@ public class MovieRepository {
     //********************************************
     //Check if there are movies left in database
     //********************************************
-    public Boolean isThereMoviesLeft(){
+    public Boolean isThereMoviesLeft() {
         long count = realm.where(Movie.class)
                 .count();
-        return count>0;
+        return count > 0;
     }
 
 
     //**************************************
     //Return the user that has the same ID
     //**************************************
-    public LiveData<User> getUserById(int userId){
+    public LiveData<User> getUserById(int userId) {
         MutableLiveData<User> userLiveData = new MutableLiveData<>();
         realm.executeTransactionAsync(realm -> {
             User user = realm.where(User.class)
@@ -283,13 +304,12 @@ public class MovieRepository {
         movieApiService.getUserFavoriteMovies(API_TOKEN, ACCEPT_HEADER, accountId, language, page, sessionId).enqueue(new Callback<MoviesList>() {
             @Override
             public void onResponse(Call<MoviesList> call, Response<MoviesList> response) {
-                if(response.isSuccessful() && response.body()!=null){
+                if (response.isSuccessful() && response.body() != null) {
                     Log.d("GetUserFav", "Transaction ok" + response.body());
                     Log.d("GetUserFav", "Transaction ok" + response.body().getTotal_results());
                     resultList.postValue(response.body().getResults());
                     Log.v("GetUserFav", "empty response : " + response.code() + " / " + response.message());
-                }
-                else{
+                } else {
                     Log.v("GetUserFav", "empty response");
                 }
             }
@@ -306,15 +326,15 @@ public class MovieRepository {
     //****************************************************************************************************
     //Turn all movies in database to not favorite and get user favorite movie and change them in database
     //****************************************************************************************************
-    public void turnUserFavMovieInDatabase(List<Result> resultList){
+    public void turnUserFavMovieInDatabase(List<Result> resultList) {
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 List<Movie> moviesList = realm.where(Movie.class).findAll();
-                for(Movie movie : moviesList){
+                for (Movie movie : moviesList) {
                     movie.setFavorite(false);
                 }
-                for(Result result : resultList){
+                for (Result result : resultList) {
                     Log.d("TurnUserFav", "Recherche du film avec ID: " + result.getId());
                     Movie managedFavMovie = realm.where(Movie.class)
                             .equalTo("id_title", result.getId())
@@ -322,8 +342,7 @@ public class MovieRepository {
                     if (managedFavMovie != null) {
                         managedFavMovie.setFavorite(true);
                         Log.d("TurnUserFav", "Inside database: Managed movie favorite set to true");
-                    }
-                    else {
+                    } else {
                         Log.d("TurnUserFav", "ManageMovie null");
                     }
                 }
@@ -336,13 +355,13 @@ public class MovieRepository {
     //***********************************************************
     //Turn all movies into no favorite for guest user connexion
     //***********************************************************
-    public void allMovieNotFav(){
+    public void allMovieNotFav() {
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 List<Movie> moviesList = realm.where(Movie.class)
                         .findAll();
-                for(Movie movie: moviesList){
+                for (Movie movie : moviesList) {
                     movie.setFavorite(false);
                 }
                 realm.insertOrUpdate(moviesList);
@@ -355,16 +374,15 @@ public class MovieRepository {
     //Post a favorite movie onto the user account
     //********************************************
 
-    public void postFavoriteMovie(Movie movie, int accountId, String sessionId, boolean isFav){
+    public void postFavoriteMovie(Movie movie, int accountId, String sessionId, boolean isFav) {
         FavoriteRequest favRequest = new FavoriteRequest("movie", movie.getId_title(), isFav);
         movieApiService.addFavoriteMovie(API_TOKEN, ACCEPT_HEADER, ACCEPT_HEADER, accountId, sessionId, favRequest).enqueue(new Callback<Result>() {
             @Override
             public void onResponse(Call<Result> call, Response<Result> response) {
-                if(response.isSuccessful()){
-                    Log.d("FavoriteResponse", "Films ajouté "+response.body());
-                }
-                else{
-                    Log.d("FavoriteResponse", "Films pas ajouté "+response.code()+ " - " + response.errorBody());
+                if (response.isSuccessful()) {
+                    Log.d("FavoriteResponse", "Films ajouté " + response.body());
+                } else {
+                    Log.d("FavoriteResponse", "Films pas ajouté " + response.code() + " - " + response.errorBody());
                 }
 
             }
@@ -381,14 +399,14 @@ public class MovieRepository {
     //Delete user from database
     //***************************
 
-    public void deleteUserFromDatabase(int userId, Runnable onSuccess){
+    public void deleteUserFromDatabase(int userId, Runnable onSuccess) {
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 User managedUser = realm.where(User.class)
                         .equalTo("id", userId)
                         .findFirst();
-                if(managedUser!=null){
+                if (managedUser != null) {
                     managedUser.deleteFromRealm();
                 }
             }
@@ -407,8 +425,6 @@ public class MovieRepository {
             }
         });
     }
-
-
 
 
     //**********************

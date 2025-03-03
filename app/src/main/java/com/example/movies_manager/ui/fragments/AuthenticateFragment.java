@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -17,7 +16,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.movies_manager.R;
+
+import com.example.movies_manager.databinding.WebAuthenticateFragmentBinding;
 import com.example.movies_manager.pojo.authenticate.SessionUserResponse;
 import com.example.movies_manager.viewModel.AuthUserViewModel;
 
@@ -31,6 +31,7 @@ public class AuthenticateFragment extends DialogFragment {
     //Variables
     //***********
 
+    private WebAuthenticateFragmentBinding binding;
     private AuthListener authListener;
     private String authUrl;
 
@@ -59,9 +60,7 @@ public class AuthenticateFragment extends DialogFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.web_authenticate_fragment, container, false);
-        WebView webView = view.findViewById(R.id.webview_auth);
-        Button bt_continue = view.findViewById(R.id.bt_continue);
+        binding = WebAuthenticateFragmentBinding.inflate(inflater, container, false);
         authUserViewModel = new ViewModelProvider(requireActivity()).get(AuthUserViewModel.class);
 
         if (getArguments() != null) {
@@ -73,24 +72,24 @@ public class AuthenticateFragment extends DialogFragment {
         //*************************
         // WebView Configuration
         //*************************
-        webView.getSettings().setJavaScriptEnabled(true);
+        binding.webviewAuth.getSettings().setJavaScriptEnabled(true);
 
 
         //********************************************
         // Load the right URL with the token provided
         //********************************************
-        webView.loadUrl(authUrl + approvedToken);
+        binding.webviewAuth.loadUrl(authUrl + approvedToken);
 
 
         //*********************************************************************
         // Check when the URL change to /allow and display the continue button
         //*********************************************************************
-        webView.setWebViewClient(new WebViewClient() {
+        binding.webviewAuth.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 String url = request.getUrl().toString();
                 if (url.contains("/allow")) {
-                    bt_continue.setVisibility(View.VISIBLE);
+                    binding.btContinue.setVisibility(View.VISIBLE);
                 }
                 return false;
             }
@@ -100,11 +99,11 @@ public class AuthenticateFragment extends DialogFragment {
         //*****************************************************
         //Create a session when the continue button is clicked
         //*****************************************************
-        bt_continue.setOnClickListener(v -> {
+        binding.btContinue.setOnClickListener(v -> {
             createSession();
         });
 
-        return view;
+        return binding.getRoot();
     }
 
 

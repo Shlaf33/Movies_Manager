@@ -13,11 +13,20 @@ import com.example.movies_manager.service.RetrofitService;
 import com.example.movies_manager.service.TokenCallback;
 import com.example.movies_manager.service.UserApiService;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import dagger.Module;
+import dagger.Provides;
+import dagger.hilt.InstallIn;
+import dagger.hilt.components.SingletonComponent;
 import io.realm.Realm;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+@Module
+@InstallIn(SingletonComponent.class)
 public class AuthUserRepository {
 
     //***********
@@ -33,13 +42,25 @@ public class AuthUserRepository {
     private final MutableLiveData<User> userLiveData = new MutableLiveData<>();
 
 
-    //***************
-    //Constructor
-    //***************
+    //****************************************
+    //Constructors with injected Realm module
+    //****************************************
 
-    public AuthUserRepository(){
+    @Provides
+    @Singleton
+    public AuthUserRepository provideAuthRepository(Realm realm) {
+
+        return new AuthUserRepository(realm);
+    }
+
+    public AuthUserRepository() {
+
+    }
+
+    @Inject
+    public AuthUserRepository(Realm realm) {
         userApiService = RetrofitService.getUserApiInstance();
-        realm = Realm.getDefaultInstance();
+        this.realm = realm;
         loadUserFromDatabase();
     }
 
@@ -75,14 +96,14 @@ public class AuthUserRepository {
 
     public void createSession(String requestToken, Callback<SessionUserResponse> callback) {
         SessionRequest request = new SessionRequest(requestToken);
-        userApiService.createSession(API_TOKEN, ACCEPT_HEADER, ACCEPT_HEADER,request).enqueue(callback);
+        userApiService.createSession(API_TOKEN, ACCEPT_HEADER, ACCEPT_HEADER, request).enqueue(callback);
     }
 
     //************************
     //Create a guest session
     //************************
 
-    public void createGuestSession(Callback<SessionGuestUserResponse> callback){
+    public void createGuestSession(Callback<SessionGuestUserResponse> callback) {
         userApiService.createGuestSession(API_TOKEN, ACCEPT_HEADER).enqueue(callback);
     }
 
@@ -90,7 +111,7 @@ public class AuthUserRepository {
     //Check if there is a user in database
     //*************************************
 
-    public boolean isUserInDatabase(User user){
+    public boolean isUserInDatabase(User user) {
         User userLogged = realm.where(User.class)
                 .equalTo("id", user.getId())
                 .findFirst();
@@ -128,17 +149,16 @@ public class AuthUserRepository {
     //Get the user account details once the session is approved
     //************************************************************
 
-    public void getAccountId(String sessionId, Callback<AccountDetail> callback){
+    public void getAccountId(String sessionId, Callback<AccountDetail> callback) {
         userApiService.getAccountId(API_TOKEN, ACCEPT_HEADER, sessionId).enqueue(callback);
     }
-
 
 
     //**********************
     //Close Realm instance
     //**********************
 
-    public void closeRealm(){
+    public void closeRealm() {
         if (realm != null && !realm.isClosed()) {
             realm.close();
         }

@@ -10,8 +10,12 @@ import com.example.movies_manager.pojo.authenticate.SessionUserResponse;
 import com.example.movies_manager.repositories.AuthUserRepository;
 import com.example.movies_manager.service.TokenCallback;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.lifecycle.HiltViewModel;
 import retrofit2.Callback;
 
+@HiltViewModel
 public class AuthUserViewModel extends ViewModel {
 
     //**********
@@ -25,8 +29,9 @@ public class AuthUserViewModel extends ViewModel {
     //Constructor
     //************
 
-    public AuthUserViewModel(){
-        authUserRepository = new AuthUserRepository();
+    @Inject
+    public AuthUserViewModel(AuthUserRepository authUserRepository){
+        this.authUserRepository = authUserRepository;
 
     }
 

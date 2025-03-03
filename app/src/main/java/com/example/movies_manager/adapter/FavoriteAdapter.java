@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.Target;
 import com.example.movies_manager.R;
+import com.example.movies_manager.databinding.FragmentFavorisBinding;
 import com.example.movies_manager.model.Movie;
 
 import java.util.ArrayList;
@@ -32,9 +33,8 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_favoris, parent, false);
-        return new FavoriteAdapter.ViewHolder(view);
+        FragmentFavorisBinding binding = FragmentFavorisBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        return new ViewHolder(binding);
     }
 
     @Override
@@ -56,14 +56,14 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
         private final ImageView iv_movie_image_fav;
         private final TextView tv_movie_title_fav, tv_release_date_fav, tv_popularity_fav, tv_overview_text_fav;
 
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
+        public ViewHolder(@NonNull FragmentFavorisBinding binding) {
+            super(binding.getRoot());
 
-            iv_movie_image_fav = itemView.findViewById(R.id.iv_movie_image_fav);
-            tv_movie_title_fav = itemView.findViewById(R.id.tv_movie_title_fav);
-            tv_release_date_fav = itemView.findViewById(R.id.tv_release_date_fav);
-            tv_popularity_fav = itemView.findViewById(R.id.tv_popularity_fav);
-            tv_overview_text_fav = itemView.findViewById(R.id.tv_overview_text_fav);
+            iv_movie_image_fav = binding.ivMovieImageFav;
+            tv_movie_title_fav = binding.tvMovieTitleFav;
+            tv_release_date_fav = binding.tvReleaseDateFav;
+            tv_popularity_fav = binding.tvPopularityFav;
+            tv_overview_text_fav = binding.tvOverviewTextFav;
         }
 
         public void bind(Movie movie) {
